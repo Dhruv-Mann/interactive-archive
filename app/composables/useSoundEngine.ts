@@ -21,20 +21,20 @@ export function useSoundEngine() {
   const toggleMute = () => {
     isMuted.value = !isMuted.value
     if (typeof window !== 'undefined') {
-      localStorage.setItem('managia_muted', isMuted.value ? 'true' : 'false')
+      localStorage.setItem('nexus_muted', isMuted.value ? 'true' : 'false')
     }
   }
 
   const unmute = () => {
     isMuted.value = false
     if (typeof window !== 'undefined') {
-      localStorage.setItem('managia_muted', 'false')
+      localStorage.setItem('nexus_muted', 'false')
     }
   }
 
   const initSound = () => {
     if (typeof window === 'undefined') return
-    const saved = localStorage.getItem('managia_muted')
+    const saved = localStorage.getItem('nexus_muted')
     if (saved !== null) {
       isMuted.value = saved === 'true'
     }

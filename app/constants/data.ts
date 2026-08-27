@@ -1,7 +1,7 @@
 /**
- * Managia — Static Data Constants
+ * NEXUS — Static Data Constants
  *
- * All placeholder data for the website. Replace with real data as it becomes available.
+ * All placeholder data for the template.
  * Organized by domain. Never scatter raw data inside components.
  */
 
@@ -18,13 +18,13 @@ export const WORK_VERTICALS: WorkVertical[] = [
   },
   {
     title: 'Conferences',
-    description: 'Speaker-led sessions featuring industry leaders, alumni panels, and deep-dive workshops on business and technology.',
+    description: 'Speaker-led sessions featuring industry leaders, panels, and deep-dive workshops on design and technology.',
     icon: 'mic',
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop',
   },
   {
-    title: 'Cultural Events',
-    description: 'Festivals, open mics, art showcases, and celebrations that bring the campus community together beyond the classroom.',
+    title: 'Creative Nights',
+    description: 'Festivals, open mics, art showcases, and celebrations that bring the community together.',
     icon: 'palette',
     image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop',
   },
@@ -40,49 +40,49 @@ export const WORK_VERTICALS: WorkVertical[] = [
 
 export const TEAM_MEMBERS: TeamMember[] = [
   {
-    name: 'Arjun Mehta',
-    role: 'President',
-    bio: 'MBA candidate with a background in strategy consulting. Believes clubs should build skills, not just resumes.',
-    quote: 'Build things that outlast your tenure.',
+    name: 'Alex Chen',
+    role: 'Founder',
+    description: 'Lead architect with a background in systems engineering. Believes code should be beautiful inside and out.',
+    quote: 'Build things that outlast the hype.',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop',
     socials: { linkedin: '#', instagram: '#' },
   },
   {
-    name: 'Priya Sharma',
-    role: 'VP Operations',
-    bio: 'Operations specialist who turns chaos into clean systems. Previously ran logistics for a 500-person conference.',
+    name: 'Sarah Jenkins',
+    role: 'Head of Operations',
+    description: 'Operations specialist who turns chaos into clean systems. Keeps the entire collective running smoothly.',
     quote: 'Chaos is just order that hasn\'t been designed yet.',
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop',
     socials: { linkedin: '#', instagram: '#' },
   },
   {
-    name: 'Karan Patel',
-    role: 'Head of Events',
-    bio: 'The person behind every memorable Managia event. Thinks every gathering should leave people talking for weeks.',
+    name: 'David Kim',
+    role: 'Event Director',
+    description: 'The person behind every memorable gathering. Thinks every event should leave people talking for weeks.',
     quote: 'If they\'re not talking about it the next day, it didn\'t happen.',
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop',
     socials: { linkedin: '#' },
   },
   {
-    name: 'Sneha Iyer',
+    name: 'Elena Rostova',
     role: 'Creative Director',
-    bio: 'Designs everything you see. Obsessed with typography, color theory, and making student clubs look legitimate.',
+    description: 'Designs everything you see. Obsessed with typography, color theory, and making interfaces feel alive.',
     quote: 'Aesthetics are a form of argument.',
     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=400&auto=format&fit=crop',
     socials: { linkedin: '#', instagram: '#' },
   },
   {
-    name: 'Rohan Das',
-    role: 'Head of Tech',
-    bio: 'Full-stack developer and hackathon organizer. Builds the tools and platforms that keep Managia running.',
+    name: 'Marcus Wright',
+    role: 'Lead Developer',
+    description: 'Full-stack developer and performance optimizer. Builds the tools and platforms that power the collective.',
     quote: 'Ship it. Then make it perfect.',
     image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400&auto=format&fit=crop',
     socials: { linkedin: '#', twitter: '#' },
   },
   {
-    name: 'Ananya Reddy',
+    name: 'Aisha Patel',
     role: 'Head of Outreach',
-    bio: 'Connects Managia with sponsors, partners, and the wider community. Makes sure the right people know about us.',
+    description: 'Connects the collective with sponsors, partners, and the wider community. Makes sure the right people know about us.',
     quote: 'Every partnership starts with a real conversation.',
     image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop',
     socials: { linkedin: '#', instagram: '#' },
@@ -116,8 +116,8 @@ export const EVENTS: ClubEvent[] = [
   },
   {
     id: 'e3',
-    title: 'Cultural Night',
-    description: 'An evening of performances, food, and art from the diverse cultures represented in our MBA cohort.',
+    title: 'Creative Night',
+    description: 'An evening of performances, food, and digital art showcases from our collective.',
     date: 'Oct 12, 2026',
     time: '6:30 PM',
     location: 'Open Air Theatre',
@@ -274,7 +274,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   },
   {
     title: 'Core Team',
-    description: 'Step up. Lead initiatives, organize events, and shape what Managia becomes.',
+    description: 'Step up. Lead initiatives, organize events, and shape what the collective becomes.',
     perks: [
       'Everything in Member',
       'Lead or co-lead a vertical',
@@ -286,7 +286,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   },
   {
     title: 'Partner',
-    description: 'For organizations and sponsors who want to collaborate with Managia.',
+    description: 'For organizations and sponsors who want to collaborate with NEXUS.',
     perks: [
       'Brand presence at all events',
       'Co-hosted workshops and sessions',
@@ -312,5 +312,5 @@ export const SOCIAL_LINKS = {
   instagram: '#',
   linkedin: '#',
   twitter: '#',
-  email: 'hello@managia.club',
+  email: 'hello@nexus.dev',
 } as const

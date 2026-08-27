@@ -46,7 +46,7 @@
       </div>
     </div>
     
-    <!-- Title overlay to fit Managia Aesthetic -->
+    <!-- Title overlay to fit NEXUS Aesthetic -->
     <div class="absolute top-12 left-12 pointer-events-none z-20">
       <h2 class="text-4xl md:text-6xl font-black tracking-tighter text-[#FEE7C8] mix-blend-difference">THE SYNDICATE</h2>
       <p class="text-[#FF9292] font-mono text-sm tracking-widest mt-2">CLUB ARCHITECTS // INFINITE SCROLL</p>
@@ -65,7 +65,7 @@ interface ProjectData {
   description: string
 }
 
-// Unsplash images provided in the React component snippet, adapted for Managia roles
+// Unsplash images provided in the React component snippet, adapted for NEXUS roles
 const PROJECT_DATA: ProjectData[] = [
   {
     title: "MEMBER // KAI",

@@ -66,7 +66,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 // ─── Poem HTML ───────────────────────────────────────────────────────────────
-const PHRASE_HTML = '<span class="brand-red">UNMANAGED</span> — A Club where passion is born and raised   ✶   '
+const PHRASE_HTML = '<span class="brand-red">NEXUS</span> — A collective where digital passion is born   ✶   '
 // 40 repeats gives ~100,000px of text; well beyond any single animation cycle.
 const REPEAT = 40
 
@@ -447,7 +447,7 @@ onUnmounted(() => {
   animation-delay: -6s;
 }
 
-/* Red brand highlight for MANAGIA — no glow, just a clean vivid red */
+/* Red brand highlight for NEXUS — no glow, just a clean vivid red */
 .face.text :deep(.brand-red) {
   color: #ff2255;
   text-shadow: none;

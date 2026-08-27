@@ -8,7 +8,7 @@
           <span class="w-3 h-3 rounded-full bg-[#FF007F] inline-block"></span>
           <span class="w-3 h-3 rounded-full bg-[#CCFF00] inline-block"></span>
           <span class="w-3 h-3 rounded-full bg-[#00F0FF] inline-block"></span>
-          <span class="text-xs text-white/70 font-bold ml-2">MANAGIA_CORE_TERMINAL // v2.6.4</span>
+          <span class="text-xs text-white/70 font-bold ml-2">NEXUS_CORE_TERMINAL // v2.6.4</span>
         </div>
         <button 
           @click="closeTerminal" 
@@ -22,14 +22,14 @@
       <div ref="outputRef" class="p-6 h-72 overflow-y-auto space-y-3 text-xs leading-relaxed text-[#CCFF00] cyber-scanlines">
         <div class="text-white/40">Type 'help' for available commands. Try 'party', 'matrix', or 'stats'.</div>
         <div v-for="(line, idx) in logHistory" :key="idx" :class="line.isCommand ? 'text-white font-bold' : 'text-[#CCFF00]/90 whitespace-pre-wrap'">
-          <span v-if="line.isCommand" class="text-[#00F0FF] mr-2">managia@host:~$</span>
+          <span v-if="line.isCommand" class="text-[#00F0FF] mr-2">nexus@host:~$</span>
           {{ line.text }}
         </div>
       </div>
 
       <!-- Command Input Row -->
       <form @submit.prevent="executeCommand" class="px-4 py-3 bg-[#0E0E14] border-t border-[#CCFF00]/30 flex items-center gap-2">
-        <span class="text-[#00F0FF] text-xs font-bold">managia@host:~$</span>
+        <span class="text-[#00F0FF] text-xs font-bold">nexus@host:~$</span>
         <input
           ref="inputRef"
           v-model="inputCommand"

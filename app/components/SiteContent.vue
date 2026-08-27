@@ -6,7 +6,7 @@
       class="absolute top-6 left-6 z-50 flex items-center cursor-pointer group select-none hover:scale-105 transition-transform duration-300"
       @mouseenter="sound.playHover"
     >
-      <img src="/logo.svg" alt="Managia Logo" class="h-12 w-auto" />
+      <div class="text-white font-bold text-xl tracking-[0.2em] select-none uppercase">NEXUS</div>
     </div>
 
 
@@ -50,7 +50,7 @@
           class="absolute inset-0 flex items-center justify-center pointer-events-auto"
           :style="{ opacity: spacer2AsciiOpacity }"
         >
-          <AsciiText text="UNMANAGED" :asciiFontSize="8" :textFontSize="200" :planeBaseHeight="5.6" />
+          <AsciiText text="NEXUS" :asciiFontSize="8" :textFontSize="200" :planeBaseHeight="5.6" />
         </div>
 
         <div 

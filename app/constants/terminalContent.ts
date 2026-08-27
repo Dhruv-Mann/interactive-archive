@@ -1,6 +1,6 @@
 /**
- * Cyber After Hours Content Constants
- * Reuses images and data from the core Managia dataset, augmented with cyber-brutalist metadata.
+ * NEXUS — Terminal Easter Egg Content
+ * Reuses images and data from the core NEXUS dataset, augmented with cyber-brutalist metadata.
  */
 
 import { WORK_VERTICALS, EVENTS, TEAM_MEMBERS, GALLERY_IMAGES } from '~/constants/data'
@@ -90,7 +90,8 @@ export const CYBER_HERO_TICKER = [
 ]
 
 export const TERMINAL_COMMANDS: Record<string, string> = {
-  'help': 'AVAILABLE COMMANDS:\n- matrix    : Toggle falling digital matrix rain\n- party     : Launch hyper-confetti blast\n- synth     : Run synthesized chord demo\n- warp      : Toggle reality morph back to classroom\n- stats     : Print club metrics telemetry\n- clear     : Wipe terminal screen\n- lore      : Why Managia exists',
-  'lore': 'MANAGIA LORE:\nStarted by late-night builders who got tired of sitting through 80-slide decks.\nWe build real products, drop live beats, host hackathons, and prove that business school can have taste.',
+  'help': 'AVAILABLE COMMANDS:\n- matrix    : Toggle falling digital matrix rain\n- party     : Launch hyper-confetti blast\n- synth     : Run synthesized chord demo\n- warp      : Toggle reality morph back to baseline\n- stats     : Print cluster metrics telemetry\n- clear     : Wipe terminal screen\n- lore      : Why NEXUS exists',
+  'lore': 'NEXUS SYSTEM LOG:\nStarted by late-night builders who got tired of the boring web.\nWe build real products, drop live beats, host hackathons, and prove that digital experiences can have taste.',
   'stats': 'SYSTEM TELEMETRY:\n• Active Cohort: 340 Builders\n• Shipped Projects: 42\n• Caffeine Level: 99.8%\n• Average Sleep: 4.2 hrs\n• Status: OPERATIONAL',
+  'whoami': 'You are a guest thread attached to the NEXUS mainframe.',
 }

@@ -78,7 +78,7 @@
         <span :ref="(el) => { if (el) textSegmentsRef[5] = el as HTMLSpanElement }" class="text-segment opacity-0">INTO A METICULOUSLY</span>
         <div :ref="(el) => { if (el) placeholdersRef[4] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
         
-        <span :ref="(el) => { if (el) textSegmentsRef[6] = el as HTMLSpanElement }" class="text-segment opacity-0 text-[#B57EDC]">UNMANAGED</span>
+        <span :ref="(el) => { if (el) textSegmentsRef[6] = el as HTMLSpanElement }" class="text-segment opacity-0 text-[#B57EDC]">NEXUS</span>
         <div :ref="(el) => { if (el) placeholdersRef[5] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
 
         <span :ref="(el) => { if (el) textSegmentsRef[7] = el as HTMLSpanElement }" class="text-segment opacity-0 block mt-2 text-white">LEGACY.</span>

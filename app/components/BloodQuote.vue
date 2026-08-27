@@ -48,11 +48,11 @@
           <span class="dot bg-[#FEE7C8]"></span>
           <span class="dot bg-[#C5C1C1]"></span>
         </div>
-        <div class="terminal-title">root@unmanaged:~</div>
+        <div class="terminal-title">root@nexus:~</div>
       </div>
       <div class="terminal-body font-mono">
         <div class="cmd-line">
-          <span class="prompt">root@unmanaged:~$</span> <span class="cmd">ls -la ./directives</span>
+          <span class="prompt">root@nexus:~$</span> <span class="cmd">ls -la ./directives</span>
         </div>
         <div class="cmd-output">
           <button @click="scrollToSection('core-syndicate')" class="term-link bg-transparent border-none text-left">> CONTACT_US.exe</button>
@@ -60,7 +60,7 @@
           <button @click="scrollToSection('events-archive')" class="term-link bg-transparent border-none text-left">> VIEW_ARCHIVES.log</button>
         </div>
         <div class="cmd-line mt-3">
-          <span class="prompt">root@unmanaged:~$</span> <span class="cursor animate-pulse">_</span>
+          <span class="prompt">root@nexus:~$</span> <span class="cursor animate-pulse">_</span>
         </div>
       </div>
     </div>
