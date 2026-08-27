@@ -1,0 +1,249 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CYBER BRUTALIST DESIGN SYSTEM & SHADERS
+   Segmented multi-rate keyframes, holographic foils, CRT scanlines, neon glows
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --cyber-bg: #07070a;
+  --cyber-card: #0e0e14;
+  --cyber-neon-lime: #ccff00;
+  --cyber-neon-cyan: #00f0ff;
+  --cyber-neon-magenta: #ff007f;
+  --cyber-neon-purple: #9d00ff;
+  --cyber-neon-orange: #ff5500;
+  --cyber-border: rgba(204, 255, 0, 0.25);
+  --cyber-border-cyan: rgba(0, 240, 255, 0.25);
+}
+
+/* ─── CRT Scanline & Noise Overlays ──────────────────────────────────────── */
+
+.cyber-scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 255, 0, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+}
+
+.cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(204, 255, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(204, 255, 0, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ─── Holographic Foil Reflections ────────────────────────────────────────── */
+
+.cyber-holo-foil {
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-holo-foil::before {
+  content: '';
+  position: absolute;
+  inset: -100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.15) 30%,
+    rgba(255, 0, 127, 0.2) 48%,
+    rgba(204, 255, 0, 0.25) 52%,
+    rgba(157, 0, 255, 0.15) 70%,
+    transparent 100%
+  );
+  transform: rotate(25deg) translateY(-50%);
+  animation: holoFoilSweep 4.7s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: color-dodge;
+}
+
+/* ─── Segmented Multi-Rate Motion Keyframes ───────────────────────────────── */
+
+/* Rate A (Prime 6.7s): Ambient Cyber Pulse */
+@keyframes cyberPulseRateA {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+    filter: drop-shadow(0 0 15px rgba(204, 255, 0, 0.2));
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 35px rgba(0, 240, 255, 0.4));
+  }
+}
+
+/* Rate B (Prime 2.9s): Holographic Shimmer */
+@keyframes holoFoilSweep {
+  0% {
+    transform: translateY(-80%) rotate(25deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(80%) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+/* Rate C (Prime 1.3s): Neon Border Flash */
+@keyframes neonBorderPulse {
+  0%, 100% {
+    border-color: rgba(204, 255, 0, 0.3);
+    box-shadow: 0 0 10px rgba(204, 255, 0, 0.15);
+  }
+  50% {
+    border-color: rgba(0, 240, 255, 0.8);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4), inset 0 0 10px rgba(0, 240, 255, 0.1);
+  }
+}
+
+/* Rate D (Prime 4.1s): Draggable Sticker Levitation */
+@keyframes stickerLevitate {
+  0%, 100% {
+    transform: translateY(0px) rotate(var(--rot, 0deg));
+  }
+  50% {
+    transform: translateY(-6px) rotate(calc(var(--rot, 0deg) + 1.5deg));
+  }
+}
+
+/* Rate E (Prime 0.7s): Glitch Micro-Jitter */
+@keyframes glitchJitter {
+  0%, 92%, 100% {
+    transform: translate(0, 0);
+  }
+  93% {
+    transform: translate(-2px, 1px);
+  }
+  95% {
+    transform: translate(2px, -1px);
+  }
+  97% {
+    transform: translate(-1px, -1px);
+  }
+}
+
+/* Rate F (Prime 8.3s): Radar Sweep */
+@keyframes radarSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Class Helpers ───────────────────────────────────────────────────────── */
+
+.animate-pulse-rate-a {
+  animation: cyberPulseRateA 6.7s ease-in-out infinite;
+}
+
+.animate-neon-border {
+  animation: neonBorderPulse 1.3s ease-in-out infinite;
+}
+
+.animate-sticker-float {
+  animation: stickerLevitate 4.1s ease-in-out infinite;
+}
+
+.animate-glitch-jitter {
+  animation: glitchJitter 0.7s infinite;
+}
+
+.animate-radar-sweep {
+  animation: radarSweep 8.3s linear infinite;
+}
+
+/* ─── Cyber Brutalist Box Shadows & Glass Refraction ──────────────────────── */
+
+.cyber-brutal-shadow {
+  box-shadow: 4px 4px 0px #ccff00;
+}
+
+.cyber-brutal-shadow-cyan {
+  box-shadow: 4px 4px 0px #00f0ff;
+}
+
+.cyber-brutal-shadow-magenta {
+  box-shadow: 4px 4px 0px #ff007f;
+}
+
+.cyber-glass-surface {
+  background: rgba(14, 14, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.cyber-neon-text-glow {
+  text-shadow: 
+    0 0 10px rgba(204, 255, 0, 0.6),
+    0 0 20px rgba(204, 255, 0, 0.3),
+    0 0 35px rgba(204, 255, 0, 0.1);
+}
+
+.cyber-cyan-text-glow {
+  text-shadow: 
+    0 0 10px rgba(0, 240, 255, 0.6),
+    0 0 20px rgba(0, 240, 255, 0.3),
+    0 0 35px rgba(0, 240, 255, 0.1);
+}
+
+.cyber-magenta-text-glow {
+  text-shadow: 
+    0 0 10px rgba(255, 0, 127, 0.6),
+    0 0 20px rgba(255, 0, 127, 0.3);
+}
+
+/* ─── Reality Morph Dimensional Portal Clip-Path ─────────────────────────── */
+
+.portal-expanding {
+  transition: clip-path 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Performance: GPU Containment ───────────────────────────────────────── */
+
+/*
+ * CSS containment on connector sections:
+ * Prevents internal layout changes (WebGL canvas resize, opacity transitions)
+ * from triggering layout recalculation on the rest of the page.
+ * This is critical for smooth Lenis scrolling when WebGL components are active.
+ */
+#connector-2 {
+  contain: layout style;
+  transform: translateZ(0); /* Promote to own compositor layer */
+}
+
+/*
+ * Promote the light beam divs to their own layer — they use box-shadow which
+ * is expensive to repaint. A dedicated layer means the browser doesn't need
+ * to repaint the beam when surrounding content changes.
+ */
+#connector-2 > div:last-child,
+#connector-3 > div:last-child {
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+/*
+ * The scroll-driven opacity wrappers: hint to browser these will change,
+ * so it can pre-promote them to compositor layers.
+ */
+#connector-2 > div:first-child,
+#connector-3 > div:first-child {
+  will-change: opacity;
+}
