@@ -2,10 +2,7 @@
   <div class="min-h-screen bg-[#07070A] text-white selection:bg-[#FF2A5F] selection:text-white relative overflow-x-hidden">
     
     <!-- Top Navigation Bar -->
-    <div
-      class="absolute top-6 left-6 z-50 flex items-center cursor-pointer group select-none hover:scale-105 transition-transform duration-300"
-      @mouseenter="sound.playHover"
-    >
+    <div class="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center pointer-events-none mix-blend-difference">
       <div class="text-white font-bold text-xl tracking-[0.2em] select-none uppercase">NEXUS</div>
     </div>
 
@@ -144,10 +141,8 @@ import BloodQuote from './BloodQuote.vue'
 import TeamMembers from './TeamMembers.vue'
 import EventsSection from './EventsSection.vue'
 import AsciiText from './AsciiText.vue'
-import { useSoundEngine } from '~/composables/useSoundEngine'
 import { useLenis } from '~/composables/useLenis'
 
-const sound = useSoundEngine()
 useLenis() // Smooth scroll — bridges Lenis to GSAP ScrollTrigger globally
 const toastMessage = ref<string | null>(null)
 
@@ -238,7 +233,6 @@ const handleRsvpToast = (eventTitle: string) => {
 
 
 onMounted(() => {
-  sound.initSound()
   if (typeof window !== 'undefined') {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
