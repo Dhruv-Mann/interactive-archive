@@ -33,4 +33,16 @@ export default defineNuxtConfig({
     },
     display: 'swap',
   },
+  vite: {
+    // Pre-bundle three.js so Vite doesn't crawl and re-bundle it on every dev start.
+    // On prod this also ensures it lands in a single, consistently-named chunk.
+    optimizeDeps: {
+      include: ['three'],
+    },
+    build: {
+      // Warn when any chunk exceeds 500KB so large deps stay visible.
+      chunkSizeWarningLimit: 500,
+    },
+  },
 })
+

@@ -173,6 +173,16 @@ onMounted(() => {
   let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2)
   let initialized = false
 
+  // ─── Gradient Cache ──────────────────────────────────────────────────────────
+  // Declared here (before resize()) so they are initialised before resize() is
+  // called immediately below. let is TDZ-sensitive; declaring after the call
+  // causes "Cannot access 'lastGradSc' before initialization".
+  let cachedGlowGrad: CanvasGradient | null = null
+  let cachedBodyGrad: CanvasGradient | null = null
+  let cachedDomeGrad: CanvasGradient | null = null
+  let lastIsBeaming: boolean | null = null
+  let lastGradSc = -1
+
   function resize() {
     if (!container || !canvas) return
     const rect = container.getBoundingClientRect()
@@ -181,6 +191,7 @@ onMounted(() => {
     canvas.width = W * dpr
     canvas.height = H * dpr
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
+    lastGradSc = -1  // Invalidate gradient cache on resize
     if (initialized) {
       layoutAllText()
       buildTunnel()
@@ -751,11 +762,32 @@ onMounted(() => {
     ctx!.save()
     ctx!.translate(x, y + bob)
 
+    // Glow: recreate only when isBeaming or scale changes (not every frame)
+    if (isBeaming !== lastIsBeaming || sc !== lastGradSc) {
+      const glowR = 70 * sc
+      cachedGlowGrad = ctx!.createRadialGradient(0, 0, 10, 0, 0, glowR)
+      cachedGlowGrad.addColorStop(0, isBeaming ? "rgba(255, 146, 146, 0.30)" : "rgba(254, 231, 200, 0.12)")
+      cachedGlowGrad.addColorStop(1, "rgba(0,0,0,0)")
+
+      // Body and dome gradients: static, only recreate on scale change
+      if (sc !== lastGradSc) {
+        cachedBodyGrad = ctx!.createRadialGradient(-10 * sc, -5 * sc, 2, 0, 0, 55 * sc)
+        cachedBodyGrad.addColorStop(0, "#4a2a5e")
+        cachedBodyGrad.addColorStop(0.4, "#2d163d")
+        cachedBodyGrad.addColorStop(1, "#180924")
+
+        cachedDomeGrad = ctx!.createRadialGradient(-8 * sc, -18 * sc, 2, 0, -12 * sc, 26 * sc)
+        cachedDomeGrad.addColorStop(0, "rgba(255, 146, 146, 0.45)")
+        cachedDomeGrad.addColorStop(0.5, "rgba(24, 9, 36, 0.85)")
+        cachedDomeGrad.addColorStop(1, "rgba(24, 9, 36, 0.95)")
+
+        lastGradSc = sc
+      }
+      lastIsBeaming = isBeaming
+    }
+
     const glowR = 70 * sc
-    const glow = ctx!.createRadialGradient(0, 0, 10, 0, 0, glowR)
-    glow.addColorStop(0, isBeaming ? "rgba(255, 146, 146, 0.30)" : "rgba(254, 231, 200, 0.12)") 
-    glow.addColorStop(1, "rgba(0,0,0,0)")
-    ctx!.globalAlpha = 1; ctx!.fillStyle = glow
+    ctx!.globalAlpha = 1; ctx!.fillStyle = cachedGlowGrad!
     ctx!.beginPath(); ctx!.ellipse(0, 0, glowR, glowR * 0.5, 0, 0, Math.PI * 2); ctx!.fill()
 
     const nLights = 8, ringR = 44 * sc
@@ -771,22 +803,14 @@ onMounted(() => {
     ctx!.globalAlpha = 0.25; ctx!.fillStyle = "#000"
     ctx!.beginPath(); ctx!.ellipse(0, 6 * sc, 52 * sc, 14 * sc, 0, 0, Math.PI * 2); ctx!.fill()
 
-    const bodyGrad = ctx!.createRadialGradient(-10 * sc, -5 * sc, 2, 0, 0, 55 * sc)
-    bodyGrad.addColorStop(0, "#4a2a5e")
-    bodyGrad.addColorStop(0.4, "#2d163d")
-    bodyGrad.addColorStop(1, "#180924")
-    ctx!.globalAlpha = 0.92; ctx!.fillStyle = bodyGrad
+    ctx!.globalAlpha = 0.92; ctx!.fillStyle = cachedBodyGrad!
     ctx!.beginPath(); ctx!.ellipse(0, 0, 52 * sc, 16 * sc, 0, 0, Math.PI * 2); ctx!.fill()
 
     ctx!.globalAlpha = 0.55; ctx!.strokeStyle = "#FF9292"
     ctx!.lineWidth = 1.5 * sc
     ctx!.beginPath(); ctx!.ellipse(0, 0, 52 * sc, 16 * sc, 0, 0, Math.PI * 2); ctx!.stroke()
 
-    const domeGrad = ctx!.createRadialGradient(-8 * sc, -18 * sc, 2, 0, -12 * sc, 26 * sc)
-    domeGrad.addColorStop(0, "rgba(255, 146, 146, 0.45)")
-    domeGrad.addColorStop(0.5, "rgba(24, 9, 36, 0.85)")
-    domeGrad.addColorStop(1, "rgba(24, 9, 36, 0.95)")
-    ctx!.globalAlpha = 0.85; ctx!.fillStyle = domeGrad
+    ctx!.globalAlpha = 0.85; ctx!.fillStyle = cachedDomeGrad!
     ctx!.beginPath(); ctx!.ellipse(0, -8 * sc, 28 * sc, 22 * sc, 0, Math.PI, 0); ctx!.fill()
 
     ctx!.globalAlpha = 0.45; ctx!.strokeStyle = "#FEE7C8"

@@ -308,6 +308,8 @@ class CanvAscii {
   filter!: AsciiFilter;
   center!: { x: number; y: number };
   animationFrameId: number = 0;
+  // Dirty flag: prevents re-uploading static text texture to GPU every frame
+  _textRendered: boolean = false;
 
   constructor(
     { text, asciiFontSize, textFontSize, textColor, planeBaseHeight, enableWaves }: CanvAsciiOptions,
@@ -423,12 +425,19 @@ class CanvAscii {
   }
 
   render() {
-    const time = new Date().getTime() * 0.001;
-    this.textCanvas.render();
-    this.texture.needsUpdate = true;
-    (this.mesh.material as THREE.ShaderMaterial).uniforms.uTime.value = Math.sin(time);
-    this.updateRotation();
-    this.filter.render(this.scene, this.camera);
+    // performance.now() avoids allocating a Date object every frame (60 allocs/sec).
+    const time = performance.now() * 0.001
+    // Only re-render the text canvas and re-upload the texture when the text
+    // actually changes. The text is static between frames so this avoids a
+    // full WebGL texture upload (GPU mem copy) on every single frame.
+    if (this.texture.needsUpdate || !this._textRendered) {
+      this.textCanvas.render()
+      this.texture.needsUpdate = true
+      this._textRendered = true
+    }
+    ;(this.mesh.material as THREE.ShaderMaterial).uniforms.uTime.value = Math.sin(time)
+    this.updateRotation()
+    this.filter.render(this.scene, this.camera)
   }
 
   updateRotation() {
@@ -464,6 +473,7 @@ class CanvAscii {
 
   dispose() {
     cancelAnimationFrame(this.animationFrameId);
+    this._textRendered = false;
     if (this.filter) {
       this.filter.dispose();
       if (this.filter.domElement.parentNode) {

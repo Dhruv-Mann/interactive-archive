@@ -157,7 +157,6 @@ import { useLenis } from '~/composables/useLenis'
 const sound = useSoundEngine()
 useLenis() // Smooth scroll — bridges Lenis to GSAP ScrollTrigger globally
 const isTerminalOpen = ref(false)
-const beatpadRef = ref<HTMLDivElement | null>(null)
 const toastMessage = ref<string | null>(null)
 
 // Removed Lissajous logic to replace with horizontal CHAOS animation
@@ -172,8 +171,8 @@ const spacer4ImageRef = ref<HTMLImageElement | null>(null)
 const spacer4ImageOpacity = ref(0)
 const spacer2AsciiOpacity = ref(0)
 
-// WebGL visibility gates — v-if unmounts Three.js/OGL when off-screen,
-// completely halting their RAF loops and freeing GPU budget during scrolling.
+// WebGL visibility gate — v-if unmounts Three.js when off-screen,
+// completely halting its RAF loop and freeing GPU budget during scrolling.
 const isAsciiMounted = ref(false)
 
 // RAF-throttled scroll handler: getBoundingClientRect is expensive at 60fps.
@@ -238,13 +237,6 @@ const _doScrollCalc = () => {
     spacer4ImageOpacity.value = Math.max(0, Math.min(0.65, factor4 * 0.85))
   }
 }
-const scrollToBeatpad = () => {
-  if (beatpadRef.value) {
-    beatpadRef.value.scrollIntoView({ behavior: 'smooth' })
-    sound.playClick()
-  }
-}
-
 const handleRsvpToast = (eventTitle: string) => {
   toastMessage.value = `PASS RESERVED: ${eventTitle}! SEE YOU AFTER HOURS.`
   setTimeout(() => {
@@ -275,15 +267,14 @@ onMounted(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
 
-    // IntersectionObserver: mount WebGL components only when near viewport
-    // rootMargin '200%' = start mounting when element is within 2 screen heights
+    // IntersectionObserver: mount AsciiText only when near viewport.
+    // rootMargin '200%' = start mounting when within 2 screen heights.
     const webglObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
-          const id = (entry.target as HTMLElement).id
-          const isNear = entry.isIntersecting
-          if (id === 'connector-2') isAsciiMounted.value = isNear
-          if (id === 'connector-3') isEyeMounted.value = isNear
+          if ((entry.target as HTMLElement).id === 'connector-2') {
+            isAsciiMounted.value = entry.isIntersecting
+          }
         })
       },
       { rootMargin: '200% 0px', threshold: 0 }

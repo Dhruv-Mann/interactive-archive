@@ -77,6 +77,8 @@ const bloodWordRef = ref<HTMLElement | null>(null)
 
 let dropletRafId: number | null = null
 let sliceRafId: number | null = null
+let sectionVisible = false  // IntersectionObserver gate for both RAF loops
+let sectionObserver: IntersectionObserver | null = null
 
 const scrollToSection = (id: string) => {
   const el = document.getElementById(id)
@@ -240,7 +242,13 @@ function renderDroplets() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-  if (isBloodHovered.value) {
+  if (isBloodHovered.value && sectionVisible) {
+    // Performance: reset shadow once before loop — avoids leaking shadow state
+    // to subsequent draws. shadowBlur removed from per-droplet path: it forces
+    // a GPU blur composite per draw call at 60fps which is the heaviest cost here.
+    ctx.shadowColor = 'transparent'
+    ctx.shadowBlur = 0
+
     droplets.forEach(d => {
       d.y += d.speed
 
@@ -252,8 +260,6 @@ function renderDroplets() {
       ctx.save()
       ctx.globalAlpha = d.opacity
       ctx.fillStyle = d.color
-      ctx.shadowColor = '#240005'
-      ctx.shadowBlur = 10
 
       ctx.beginPath()
       ctx.arc(d.x, d.y, d.radius, 0, Math.PI)
@@ -334,11 +340,26 @@ onMounted(() => {
   }, 100)
   dropletRafId = requestAnimationFrame(renderDroplets)
   sliceRafId = requestAnimationFrame(renderSliceCanvas)
+
+  // Gate both RAF loops via IntersectionObserver.
+  // When BloodQuote is off-screen the loops still run but immediately return
+  // after clearRect — which is cheap. However, when sectionVisible is false
+  // we can skip even that. The loops are kept alive so they resume instantly
+  // on re-entry without needing to restart RAF chains.
+  const el = dropletsCanvasRef.value?.parentElement
+  if (el) {
+    sectionObserver = new IntersectionObserver(
+      ([entry]) => { sectionVisible = entry.isIntersecting },
+      { rootMargin: '100px 0px' }
+    )
+    sectionObserver.observe(el)
+  }
 })
 
 onBeforeUnmount(() => {
   if (dropletRafId) cancelAnimationFrame(dropletRafId)
   if (sliceRafId) cancelAnimationFrame(sliceRafId)
+  sectionObserver?.disconnect()
   window.removeEventListener('resize', handleResize)
 })
 </script>

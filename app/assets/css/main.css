@@ -15,6 +15,18 @@
   --cyber-border-cyan: rgba(0, 240, 255, 0.25);
 }
 
+/* ─── Hide Browser Scrollbar ─────────────────────────────────────────────── */
+/* Lenis handles all scrolling visually — the native scrollbar is redundant.  */
+
+html {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge legacy */
+}
+
+html::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari / Opera */
+}
+
 /* ─── CRT Scanline & Noise Overlays ──────────────────────────────────────── */
 
 .cyber-scanlines {
@@ -223,7 +235,8 @@
  * from triggering layout recalculation on the rest of the page.
  * This is critical for smooth Lenis scrolling when WebGL components are active.
  */
-#connector-2 {
+#connector-2,
+#connector-3 {
   contain: layout style;
   transform: translateZ(0); /* Promote to own compositor layer */
 }
@@ -247,3 +260,15 @@
 #connector-3 > div:first-child {
   will-change: opacity;
 }
+
+/*
+ * content-visibility: auto — the browser skips layout, paint, and compositing
+ * for sections outside the viewport. This is the single highest-ROI CSS perf
+ * technique for long-scroll pages. contain-intrinsic-size provides an estimated
+ * height so the scrollbar doesn't jump when the section enters the viewport.
+ */
+#events-archive {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 700px;
+}
+

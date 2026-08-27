@@ -167,7 +167,8 @@ function onMouseMove(e: MouseEvent) {
 // ── Lifecycle ─────────────────────────────────────────────────────
 onMounted(() => {
   window.addEventListener('mousemove', onMouseMove, { passive: true })
-  startSmoothLoop()
+  // Don't start the smooth loop yet — it will be started when active becomes true.
+  // This prevents 60 Vue reactive updates/sec on smoothPos for an invisible component.
 })
 
 onUnmounted(() => {
@@ -176,9 +177,14 @@ onUnmounted(() => {
   if (turbRafId !== null) cancelAnimationFrame(turbRafId)
 })
 
-// Reset zoom on all icons when phase deactivates
+// Reset zoom on all icons when phase deactivates; start/stop RAF with active state.
 watch(() => props.active, (val) => {
-  if (!val) {
+  if (val) {
+    // Phase 4 just activated — start the smooth loop
+    startSmoothLoop()
+  } else {
+    // Phase deactivated — stop the loop to free the RAF budget
+    stopSmoothLoop()
     hoveredMember.value = null
     linesOpacity.value = 0
     // Instantly reset all icon zoom
