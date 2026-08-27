@@ -123,12 +123,6 @@
 
     <!-- Cyber Footer removed for empty canvas -->
 
-    <!-- Secret CLI Terminal Modal -->
-    <SecretTerminal
-      :isOpen="isTerminalOpen"
-      @close="isTerminalOpen = false"
-      @triggerParty="triggerPartyConfetti"
-    />
 
     <!-- RSVP / Party Floating Notification Toast -->
     <div
@@ -149,14 +143,12 @@ import UfoHero from './UfoHero.vue'
 import BloodQuote from './BloodQuote.vue'
 import TeamMembers from './TeamMembers.vue'
 import EventsSection from './EventsSection.vue'
-import SecretTerminal from './SecretTerminal.vue'
 import AsciiText from './AsciiText.vue'
 import { useSoundEngine } from '~/composables/useSoundEngine'
 import { useLenis } from '~/composables/useLenis'
 
 const sound = useSoundEngine()
 useLenis() // Smooth scroll — bridges Lenis to GSAP ScrollTrigger globally
-const isTerminalOpen = ref(false)
 const toastMessage = ref<string | null>(null)
 
 // Removed Lissajous logic to replace with horizontal CHAOS animation
@@ -244,26 +236,10 @@ const handleRsvpToast = (eventTitle: string) => {
   }, 4000)
 }
 
-const triggerPartyConfetti = () => {
-  toastMessage.value = '🎉 FULL CAMPUS PARTY MODE ACTIVATED!'
-  setTimeout(() => {
-    toastMessage.value = null
-  }, 4000)
-}
-
-// Global keyboard shortcut to open CLI terminal with ~ or `
-const handleGlobalKey = (e: KeyboardEvent) => {
-  if (e.key === '`' || e.key === '~') {
-    e.preventDefault()
-    isTerminalOpen.value = !isTerminalOpen.value
-    sound.playClick()
-  }
-}
 
 onMounted(() => {
   sound.initSound()
   if (typeof window !== 'undefined') {
-    window.addEventListener('keydown', handleGlobalKey)
     window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
 
@@ -287,7 +263,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (typeof window !== 'undefined') {
-    window.removeEventListener('keydown', handleGlobalKey)
     window.removeEventListener('scroll', handleScroll)
   }
 })
