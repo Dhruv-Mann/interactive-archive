@@ -13,7 +13,22 @@
       <NewLandingHero />
 
       <!-- Timeline Light Beam Connector 0 -->
-      <div class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+      <div class="h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
+        
+        <!-- Background ASCII Art (PNG) -->
+        <div class="absolute inset-0 flex items-center justify-center z-0 opacity-70">
+          <img 
+            src="/ascii-art.png" 
+            alt="ASCII Art" 
+            class="h-[60vh] w-auto mix-blend-screen object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]"
+            style="
+              -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 50%, black 30%, rgba(0,0,0,0.6) 60%, transparent 85%);
+              mask-image: radial-gradient(ellipse 60% 65% at 50% 50%, black 30%, rgba(0,0,0,0.6) 60%, transparent 85%);
+            "
+          />
+        </div>
+
+        <!-- The light beam -->
         <div 
           class="h-full w-[2px] z-10"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
