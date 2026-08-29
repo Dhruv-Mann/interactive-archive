@@ -9,7 +9,18 @@
 
     <!-- Main Content Flow -->
     <main class="relative z-10">
-      <!-- 1. 3D Poem Hero Room Landing Section -->
+      <!-- 0. NEW Landing Hero (HtmlBlaze) -->
+      <NewLandingHero />
+
+      <!-- Timeline Light Beam Connector 0 -->
+      <div class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+        <div 
+          class="h-full w-[2px] z-10"
+          style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
+        ></div>
+      </div>
+
+      <!-- 1. 3D Poem Hero Room -->
       <PoemHero />
       
       <!-- Timeline Light Beam Connector 1 -->
@@ -135,6 +146,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import NewLandingHero from './NewLandingHero.vue'
 import PoemHero from './PoemHero.vue'
 import UfoHero from './UfoHero.vue'
 import BloodQuote from './BloodQuote.vue'
