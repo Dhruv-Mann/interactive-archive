@@ -1,19 +1,31 @@
 <script setup lang="ts">
 import HtmlBlaze from './HtmlBlaze.vue'
+import HtmlEffectDemoSurface from './HtmlEffectDemoSurface.vue'
+
+interface Props {
+  scale?: number;
+  speed?: number;
+  strength?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  scale: 6,
+  speed: 1,
+  strength: 0.03,
+});
 </script>
 
 <template>
-  <section class="relative w-full h-[100dvh] bg-[#07070A] flex flex-col items-center justify-center overflow-hidden">
-    <!-- HTML Blaze wrapped title -->
-    <HtmlBlaze class="w-full max-w-6xl aspect-[21/9] mx-auto flex items-center justify-center">
-      <div class="flex flex-col items-center justify-center w-full h-full text-center">
-        <h1 class="text-[15vw] font-black tracking-tighter leading-none text-white uppercase" style="text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);">
-          NEXUS
-        </h1>
-        <p class="text-2xl md:text-4xl font-mono text-white tracking-[0.3em] mt-8 uppercase" style="text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);">
-          Digital Collective
-        </p>
-      </div>
+  <section class="h-[100dvh] w-full bg-zinc-950 p-3 sm:p-5 flex items-center justify-center">
+    <HtmlBlaze
+      v-bind="props"
+      class="w-full max-w-6xl aspect-video border border-white/15 bg-white text-zinc-950 rounded-2xl shadow-2xl"
+    >
+      <HtmlEffectDemoSurface
+        effect="blaze"
+        headline="UNMANAGED"
+        description="AKA MANAGIA"
+      />
     </HtmlBlaze>
   </section>
 </template>
