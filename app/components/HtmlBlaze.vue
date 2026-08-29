@@ -12,6 +12,7 @@ interface Props {
   scale?: number;
   speed?: number;
   strength?: number;
+  intensity?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
   scale: 6,
   speed: 1,
   strength: 0.03,
+  intensity: 1.0,
 });
 
 const shaderCode = `
@@ -31,6 +33,7 @@ const shaderCode = `
 uniform float uScale;
 uniform float uSpeed;
 uniform float uStrength;
+uniform float uIntensity;
 
 vec3 mod289(vec3 value) {
   return value - floor(value * (1.0 / 289.0)) * 289.0;
@@ -151,7 +154,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   float time = iTime * max(uSpeed, 0.01) * 0.5;
   float horizontal = uv.x;
   float vertical = uv.y;
-  float flameHeight = max(iResolution.y * 0.62, 1.0);
+  float flameHeight = max(iResolution.y * 0.62 * max(uIntensity, 0.001), 1.0);
   float flameY = fragCoord.y / flameHeight;
   float heightFalloff = clamp(2.0 - flameY, 0.0, 1.0);
   float clippedHeight = min(flameY, 1.0);
@@ -227,7 +230,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     * clamp(0.2 + flame * 0.65 + smoke.r, 0.0, 1.0);
   vec2 displacement = displacementField - 0.5;
   displacement += vec2((noise - 0.5) * 0.35, flow.y * 0.03 - flame * 0.08);
-  displacement *= uStrength * distortionMask;
+  // Scale distortion by uIntensity so the wobble reduces as the fire shrinks
+  displacement *= uStrength * uIntensity * distortionMask;
   vec2 sampleUv = clamp(uv + displacement, vec2(0.002), vec2(0.998));
 
   if (iHasContent < 0.5) {
@@ -247,6 +251,7 @@ const uniforms = computed(() => ({
   uScale: props.scale,
   uSpeed: props.speed,
   uStrength: props.strength,
+  uIntensity: props.intensity,
 }));
 </script>
 
