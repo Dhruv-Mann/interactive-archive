@@ -25,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 const containerRef = ref<HTMLElement | null>(null);
 const slotRef = ref<HTMLElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
+const isVisible = ref(true);
 
 let renderer: THREE.WebGLRenderer | null = null;
 let scene: THREE.Scene | null = null;
@@ -32,6 +33,7 @@ let camera: THREE.OrthographicCamera | null = null;
 let material: THREE.ShaderMaterial | null = null;
 let texture: THREE.CanvasTexture | null = null;
 let animationFrameId: number | null = null;
+let observer: IntersectionObserver | null = null;
 let startTime = performance.now();
 
 const vertexShader = `
@@ -130,7 +132,11 @@ function initThree() {
 }
 
 function render() {
-  if (props.paused) return;
+  // Always queue next frame to keep loop alive
+  animationFrameId = requestAnimationFrame(render);
+
+  // Skip heavy WebGL calls if off-screen or manually paused
+  if (props.paused || !isVisible.value) return;
 
   const currentTime = (performance.now() - startTime) / 1000;
   if (material) {
@@ -140,8 +146,6 @@ function render() {
   if (renderer && scene && camera) {
     renderer.render(scene, camera);
   }
-
-  animationFrameId = requestAnimationFrame(render);
 }
 
 watch(
@@ -161,11 +165,23 @@ onMounted(() => {
   initThree();
   updateTexture();
   render();
+
+  // Performance Optimization: Only render when near viewport
+  if (containerRef.value && typeof window !== 'undefined') {
+    observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible.value = entry.isIntersecting;
+      },
+      { rootMargin: '100% 0px', threshold: 0 }
+    );
+    observer.observe(containerRef.value);
+  }
 });
 
 onBeforeUnmount(() => {
   if (animationFrameId) cancelAnimationFrame(animationFrameId);
   renderer?.dispose();
+  if (observer) observer.disconnect();
 });
 </script>
 
