@@ -76,6 +76,57 @@
           class="h-full w-[2px] z-10"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
+
+        <!-- Right Side: Text & Button -->
+        <div class="absolute right-[8vw] flex flex-col items-end justify-center pointer-events-auto z-20 w-[40vw]">
+          
+          <!-- Stacked Typography -->
+          <div class="flex flex-col items-end leading-none" :style="{ fontFamily: '&quot;Marker Felt&quot;, &quot;Comic Sans MS&quot;, cursive' }">
+            <Shuffle
+              text="Not Your"
+              shuffle-direction="right"
+              :duration="0.3"
+              :shuffle-times="1"
+              class="text-4xl text-zinc-400"
+            />
+            <Shuffle
+              text="AVERAGE"
+              shuffle-direction="right"
+              :duration="0.4"
+              :shuffle-times="2"
+              class="text-[6rem] font-black tracking-tighter text-zinc-100 my-2"
+            />
+            <Shuffle
+              text="Club"
+              shuffle-direction="right"
+              :duration="0.3"
+              :shuffle-times="1"
+              class="text-4xl text-zinc-400"
+            />
+          </div>
+
+          <SpecularButton
+            class="mt-8 mr-2"
+            size="lg"
+            :radius="18"
+            tint="#ffffff"
+            :tint-opacity="0"
+            :blur="0"
+            text-color="#f5f5f5"
+            line-color="#b57edc"
+            base-color="#525252"
+            :intensity="1.2"
+            :shine-size="15"
+            :shine-fade="40"
+            :thickness="1.5"
+            :speed="0.35"
+            follow-mouse
+            :proximity="250"
+            :auto-animate="false"
+          >
+            Join the elites
+          </SpecularButton>
+        </div>
       </div>
 
       <!-- 2. UFO Abduction Credits Interactive Section -->
