@@ -29,8 +29,12 @@ export default defineNuxtConfig({
       'Sora': [400, 500, 600, 700],
       'Inter': [400, 500, 600],
       'JetBrains+Mono': [400],
+      'Space Grotesk': [300, 500, 600, 700, 900],
+      'Archivo Black': [400],
+      'IBM Plex Mono': [500, 600],
     },
     display: 'swap',
+    preload: true,
   },
   vite: {
     // Pre-bundle three.js so Vite doesn't crawl and re-bundle it on every dev start.

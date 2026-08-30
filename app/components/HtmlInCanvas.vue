@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as THREE from "three";
 import { toCanvas } from "html-to-image";
+import { useRafWhenVisible } from "~/composables/useRafWhenVisible";
 
 interface Props {
   shaderCode: string;
@@ -25,15 +26,14 @@ const props = withDefaults(defineProps<Props>(), {
 const containerRef = ref<HTMLElement | null>(null);
 const slotRef = ref<HTMLElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
-const isVisible = ref(true);
 
 let renderer: THREE.WebGLRenderer | null = null;
 let scene: THREE.Scene | null = null;
 let camera: THREE.OrthographicCamera | null = null;
 let material: THREE.ShaderMaterial | null = null;
 let texture: THREE.CanvasTexture | null = null;
-let animationFrameId: number | null = null;
-let observer: IntersectionObserver | null = null;
+let geometry: THREE.PlaneGeometry | null = null;
+let resizeObserver: ResizeObserver | null = null;
 let startTime = performance.now();
 
 const vertexShader = `
@@ -61,18 +61,16 @@ const wrapperShader = `
 async function updateTexture() {
   if (!slotRef.value || !material) return;
 
-  // Wait for fonts to load before capturing to ensure text is visible
   if (typeof document !== 'undefined' && document.fonts) {
     await document.fonts.ready;
   }
-  
-  // Add a tiny delay to ensure DOM is fully painted
+
   await new Promise(resolve => setTimeout(resolve, 50));
 
   try {
     const canvas = await toCanvas(slotRef.value, {
       pixelRatio: props.pixelRatio,
-      style: { opacity: '1' }, // Force opacity 1 during capture since the DOM node is opacity-0
+      style: { opacity: '1' },
       skipFonts: false
     });
 
@@ -80,6 +78,7 @@ async function updateTexture() {
     texture = new THREE.CanvasTexture(canvas);
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
 
     material.uniforms.iChannel0.value = texture;
     material.uniforms.iHasContent.value = 1.0;
@@ -88,11 +87,19 @@ async function updateTexture() {
   }
 }
 
+function applySize() {
+  if (!containerRef.value || !renderer || !material) return;
+  const width = Math.max(1, containerRef.value.clientWidth);
+  const height = Math.max(1, containerRef.value.clientHeight);
+  renderer.setSize(width, height, false);
+  material.uniforms.iResolution.value.set(width, height, 1);
+}
+
 function initThree() {
   if (!containerRef.value || !canvasRef.value) return;
 
-  const width = containerRef.value.clientWidth;
-  const height = containerRef.value.clientHeight;
+  const width = Math.max(1, containerRef.value.clientWidth);
+  const height = Math.max(1, containerRef.value.clientHeight);
 
   scene = new THREE.Scene();
   camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -115,9 +122,11 @@ function initThree() {
     fragmentShader: wrapperShader,
     uniforms: parsedUniforms,
     transparent: true,
+    depthTest: false,
+    depthWrite: false,
   });
 
-  const geometry = new THREE.PlaneGeometry(2, 2);
+  geometry = new THREE.PlaneGeometry(2, 2);
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
 
@@ -126,27 +135,21 @@ function initThree() {
     alpha: true,
     antialias: true,
     precision: "highp",
+    powerPreference: "high-performance",
+    stencil: false,
+    depth: false,
   });
-  renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, props.pixelRatio));
+  renderer.setSize(width, height, false);
 }
 
-function render() {
-  // Always queue next frame to keep loop alive
-  animationFrameId = requestAnimationFrame(render);
-
-  // Skip heavy WebGL calls if off-screen or manually paused
-  if (props.paused || !isVisible.value) return;
-
-  const currentTime = (performance.now() - startTime) / 1000;
-  if (material) {
-    material.uniforms.iTime.value = currentTime;
-  }
-
-  if (renderer && scene && camera) {
-    renderer.render(scene, camera);
-  }
+function tick(now: number) {
+  if (props.paused || !renderer || !scene || !camera || !material) return;
+  material.uniforms.iTime.value = (now - startTime) / 1000;
+  renderer.render(scene, camera);
 }
+
+useRafWhenVisible(containerRef, tick, { rootMargin: '25% 0px' });
 
 watch(
   () => props.uniforms,
@@ -164,24 +167,26 @@ watch(
 onMounted(() => {
   initThree();
   updateTexture();
-  render();
 
-  // Performance Optimization: Only render when near viewport
-  if (containerRef.value && typeof window !== 'undefined') {
-    observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible.value = entry.isIntersecting;
-      },
-      { rootMargin: '100% 0px', threshold: 0 }
-    );
-    observer.observe(containerRef.value);
+  if (containerRef.value && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => applySize());
+    resizeObserver.observe(containerRef.value);
   }
 });
 
 onBeforeUnmount(() => {
-  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+  texture?.dispose();
+  geometry?.dispose();
+  material?.dispose();
   renderer?.dispose();
-  if (observer) observer.disconnect();
+  texture = null;
+  geometry = null;
+  material = null;
+  renderer = null;
+  scene = null;
+  camera = null;
 });
 </script>
 

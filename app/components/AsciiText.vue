@@ -125,7 +125,7 @@ class AsciiFilter {
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
     this.canvas.style.imageRendering = 'pixelated';
-    this.context = this.canvas.getContext('2d');
+    this.context = this.canvas.getContext('2d', { willReadFrequently: true, alpha: true });
     this.domElement.appendChild(this.canvas);
 
     this.deg = 0;
@@ -185,10 +185,15 @@ class AsciiFilter {
     return this.mouse.y - this.center.y;
   }
 
+  lastHue = '';
+
   hue() {
     const deg = (Math.atan2(this.dy, this.dx) * 180) / Math.PI;
     this.deg += (deg - this.deg) * 0.075;
-    this.domElement.style.filter = `hue-rotate(${this.deg.toFixed(1)}deg)`;
+    const next = this.deg.toFixed(1);
+    if (next === this.lastHue) return;
+    this.lastHue = next;
+    this.domElement.style.filter = `hue-rotate(${next}deg)`;
   }
 
   asciify(ctx: CanvasRenderingContext2D, w: number, h: number) {
@@ -213,7 +218,7 @@ class AsciiFilter {
       }
       str += '\n';
     }
-    this.pre.innerHTML = str;
+    this.pre.textContent = str;
   }
 
   dispose() {
@@ -310,6 +315,7 @@ class CanvAscii {
   animationFrameId: number = 0;
   // Dirty flag: prevents re-uploading static text texture to GPU every frame
   _textRendered: boolean = false;
+  running: boolean = false;
 
   constructor(
     { text, asciiFontSize, textFontSize, textColor, planeBaseHeight, enableWaves }: CanvAsciiOptions,
@@ -378,7 +384,13 @@ class CanvAscii {
   }
 
   setRenderer() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: false,
+      alpha: true,
+      powerPreference: 'high-performance',
+      stencil: false,
+      depth: false,
+    });
     this.renderer.setPixelRatio(1);
     this.renderer.setClearColor(0x000000, 0);
 
@@ -417,23 +429,34 @@ class CanvAscii {
   }
 
   animate() {
+    this.running = true;
     const animateFrame = () => {
+      if (!this.running) return;
       this.animationFrameId = requestAnimationFrame(animateFrame);
       this.render();
     };
     animateFrame();
   }
 
+  pause() {
+    this.running = false;
+    cancelAnimationFrame(this.animationFrameId);
+    this.animationFrameId = 0;
+  }
+
+  resume() {
+    if (this.running) return;
+    this.animate();
+  }
+
   render() {
-    // performance.now() avoids allocating a Date object every frame (60 allocs/sec).
     const time = performance.now() * 0.001
-    // Only re-render the text canvas and re-upload the texture when the text
-    // actually changes. The text is static between frames so this avoids a
-    // full WebGL texture upload (GPU mem copy) on every single frame.
-    if (this.texture.needsUpdate || !this._textRendered) {
+    if (!this._textRendered) {
       this.textCanvas.render()
       this.texture.needsUpdate = true
       this._textRendered = true
+    } else {
+      this.texture.needsUpdate = false
     }
     ;(this.mesh.material as THREE.ShaderMaterial).uniforms.uTime.value = Math.sin(time)
     this.updateRotation()
@@ -472,7 +495,7 @@ class CanvAscii {
   }
 
   dispose() {
-    cancelAnimationFrame(this.animationFrameId);
+    this.pause();
     this._textRendered = false;
     if (this.filter) {
       this.filter.dispose();
@@ -494,6 +517,13 @@ let asciiInstance: CanvAscii | null = null;
 let intersectionObserver: IntersectionObserver | null = null;
 let resizeObserver: ResizeObserver | null = null;
 let cancelled = false;
+let asciiInView = true;
+
+function syncAsciiLoop() {
+  if (!asciiInstance) return;
+  if (asciiInView && document.visibilityState === 'visible') asciiInstance.resume();
+  else asciiInstance.pause();
+}
 
 async function createAndInit(container: HTMLDivElement, w: number, h: number): Promise<CanvAscii> {
   const instance = new CanvAscii(
@@ -548,11 +578,22 @@ async function setup() {
       if (w > 0 && h > 0) asciiInstance.setSize(w, h);
     });
     resizeObserver.observe(container);
+
+    intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        asciiInView = entry.isIntersecting;
+        syncAsciiLoop();
+      },
+      { rootMargin: '20% 0px', threshold: 0 },
+    );
+    intersectionObserver.observe(container);
+    document.addEventListener('visibilitychange', syncAsciiLoop);
   }
 }
 
 function cleanup() {
   cancelled = true;
+  document.removeEventListener('visibilitychange', syncAsciiLoop);
   intersectionObserver?.disconnect();
   intersectionObserver = null;
   resizeObserver?.disconnect();
@@ -562,10 +603,13 @@ function cleanup() {
 }
 
 onMounted(() => {
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Archivo+Black&display=swap';
-  document.head.appendChild(link);
+  if (!document.querySelector('link[data-ascii-fonts]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.setAttribute('data-ascii-fonts', 'true');
+    link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Archivo+Black&display=swap';
+    document.head.appendChild(link);
+  }
 
   cancelled = false;
   setup();

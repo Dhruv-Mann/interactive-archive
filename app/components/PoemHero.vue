@@ -1,5 +1,5 @@
 <template>
-  <header class="hero-section">
+  <header ref="heroSectionRef" class="hero-section">
     <div class="poem-outer">
       <div
         ref="contentRef"
@@ -11,7 +11,7 @@
           <img class="ascii-hand right-hand" src="/images/right-hand.png" alt="" aria-hidden="true" />
 
           <!-- All 3D cubes (primary + reflection) anchored here for rAF queries -->
-          <div class="container-full-3d" ref="cubeContainerRef">
+          <div class="container-full-3d">
 
           <!-- Hue cycle color overlay (matches original filter-animation) -->
           <div class="animated hue" />
@@ -64,11 +64,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRafWhenVisible } from '~/composables/useRafWhenVisible'
 
 // ─── Poem HTML ───────────────────────────────────────────────────────────────
 const PHRASE_HTML = '<span class="brand-red">NEXUS</span> — A collective where digital passion is born   ✶   '
-// 40 repeats gives ~100,000px of text; well beyond any single animation cycle.
-const REPEAT = 40
+// Loop is modulo-based; 12 copies (~30k px) covers every face with headroom.
+const REPEAT = 12
 
 const poemHTML = computed((): string => {
   const text = Array.from({ length: REPEAT }, () => PHRASE_HTML).join('')
@@ -112,6 +113,7 @@ const adjustContentSize = (): void => {
 // Interactions") keeps us at 60fps without Vue reactivity overhead.
 
 const cubeContainerRef = ref<HTMLElement | null>(null)
+const heroSectionRef = ref<HTMLElement | null>(null)
 
 // Per-face paragraph element caches — filled on mount
 let leftParagraphs:  HTMLElement[] = []
@@ -120,38 +122,34 @@ let rightParagraphs: HTMLElement[] = []
 
 // Animation state
 let loopWidth  = 80_000  // total text width (measured on mount); safe fallback
-let offset     = 0       // how far the LEFT face has travelled (px)
-let lastTs     = 0
-let rafId      = 0
+let startTs    = 0
 const SPEED    = 120     // px/s — 50% faster than original 80px/s
 
 // Precomputed junction offsets (local-space px)
 const BACK_LEAD  = 500   // back face leads left by left wall width
 const RIGHT_LEAD = 1500  // right face leads left by left(500) + back(1000)
 
-const applyOffsets = (): void => {
+const applyOffsets = (offset: number): void => {
   const lo = -((offset             ) % loopWidth)
   const bo = -((offset + BACK_LEAD ) % loopWidth)
   const ro = -((offset + RIGHT_LEAD) % loopWidth)
-  for (const p of leftParagraphs)  p.style.marginLeft = `${lo}px`
-  for (const p of backParagraphs)  p.style.marginLeft = `${bo}px`
-  for (const p of rightParagraphs) p.style.marginLeft = `${ro}px`
+  // translate3d stays on the compositor; margin-left would reflow 6 paragraphs / frame.
+  for (const p of leftParagraphs)  p.style.transform = `translate3d(${lo}px, -50%, 0)`
+  for (const p of backParagraphs)  p.style.transform = `translate3d(${bo}px, -50%, 0)`
+  for (const p of rightParagraphs) p.style.transform = `translate3d(${ro}px, -50%, 0)`
 }
 
 const tick = (ts: number): void => {
-  if (!lastTs) lastTs = ts
-  // Cap delta to 50ms so a background tab doesn't cause a huge jump
-  const dt = Math.min((ts - lastTs) / 1000, 0.05)
-  lastTs = ts
-  offset += SPEED * dt
-  applyOffsets()
-  rafId = requestAnimationFrame(tick)
+  if (!leftParagraphs.length) return
+  if (!startTs) startTs = ts
+  applyOffsets(SPEED * ((ts - startTs) / 1000))
 }
+
+useRafWhenVisible(heroSectionRef, tick, { rootMargin: '20% 0px' })
 
 const startAnimation = (): void => {
   if (!cubeContainerRef.value) return
 
-  // Cache all face <p> elements (both primary cube and reflection)
   const query = (cls: string): HTMLElement[] =>
     Array.from(cubeContainerRef.value!.querySelectorAll(`.face.${cls}.text p`))
       .filter((el): el is HTMLElement => el instanceof HTMLElement)
@@ -160,12 +158,8 @@ const startAnimation = (): void => {
   backParagraphs  = query('back')
   rightParagraphs = query('right')
 
-  // Measure total text width from the first available paragraph
   const sample = leftParagraphs[0]
   if (sample) loopWidth = sample.scrollWidth
-
-  // Kick off the loop
-  rafId = requestAnimationFrame(tick)
 }
 
 onMounted(() => {
@@ -173,7 +167,6 @@ onMounted(() => {
   adjustContentSize()
   window.addEventListener('resize', adjustContentSize, { passive: true })
 
-  // Wait for fonts before measuring text width
   if (document.fonts?.ready) {
     document.fonts.ready.then(() => requestAnimationFrame(startAnimation))
   } else {
@@ -182,7 +175,6 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  cancelAnimationFrame(rafId)
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', adjustContentSize)
   }
@@ -428,7 +420,8 @@ onUnmounted(() => {
   position: absolute;
   top: 50%;
   left: 0;
-  transform: translateY(-50%);
+  transform: translate3d(0, -50%, 0);
+  will-change: transform;
   margin: 0;
   padding: 0;
 

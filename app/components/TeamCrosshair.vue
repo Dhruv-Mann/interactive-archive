@@ -21,13 +21,13 @@
       <div
         ref="lineHRef"
         class="tc-line tc-line--h"
-        :style="{ top: `${smoothPos.y}px`, opacity: linesOpacity }"
+        :style="{ opacity: linesOpacity }"
       />
       <!-- Vertical line -->
       <div
         ref="lineVRef"
         class="tc-line tc-line--v"
-        :style="{ left: `${smoothPos.x}px`, opacity: linesOpacity }"
+        :style="{ opacity: linesOpacity }"
       />
     </div>
     </Transition>
@@ -70,7 +70,7 @@ const lineHRef = ref<HTMLDivElement | null>(null)
 const lineVRef = ref<HTMLDivElement | null>(null)
 
 const rawMouse   = reactive({ x: 0, y: 0 })
-const smoothPos  = reactive({ x: 0, y: 0 })
+const smoothPos  = { x: 0, y: 0 }
 const linesOpacity = ref(0)
 const hoveredMember = ref<TeamMember | null>(null)
 
@@ -85,6 +85,8 @@ function startSmoothLoop() {
   const tick = () => {
     smoothPos.x = lerp(smoothPos.x, rawMouse.x, 0.14)
     smoothPos.y = lerp(smoothPos.y, rawMouse.y, 0.14)
+    if (lineHRef.value) lineHRef.value.style.top = `${smoothPos.y}px`
+    if (lineVRef.value) lineVRef.value.style.left = `${smoothPos.x}px`
     rafId = requestAnimationFrame(tick)
   }
   rafId = requestAnimationFrame(tick)

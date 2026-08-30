@@ -241,6 +241,10 @@ html::-webkit-scrollbar {
   transform: translateZ(0); /* Promote to own compositor layer */
 }
 
+.timeline-spacer {
+  contain: layout style;
+}
+
 /*
  * Promote the light beam divs to their own layer — they use box-shadow which
  * is expensive to repaint. A dedicated layer means the browser doesn't need

@@ -13,10 +13,8 @@
     <canvas ref="sliceCanvasRef" class="slice-canvas" />
 
     <div 
+      ref="quoteWrapperRef"
       class="quote-editorial-wrapper font-display"
-      :style="{
-        transform: `perspective(1200px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`
-      }"
     >
       <div class="quote-line">
         <span class="phrase-medium">Giving up is not</span>
@@ -28,11 +26,6 @@
         <span 
           ref="bloodWordRef"
           class="blood-giant"
-          :style="{
-            transform: `scale(${kineticScale})`,
-            fontWeight: kineticWeight,
-            letterSpacing: `${kineticSpacing}em`
-          }"
         >
           BLOOD
         </span>
@@ -41,7 +34,7 @@
     </div>
 
     <!-- Interactive Terminal Box -->
-    <div class="terminal-box" :style="{ transform: `perspective(1200px) rotateX(${tiltX * -0.3}deg) rotateY(${tiltY * -0.3}deg)` }">
+    <div ref="terminalRef" class="terminal-box">
       <div class="terminal-header">
         <div class="terminal-dots">
           <span class="dot bg-[#FF2A5F]"></span>
@@ -68,17 +61,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const isBloodHovered = ref(false)
 const dropletsCanvasRef = ref<HTMLCanvasElement | null>(null)
 const sliceCanvasRef = ref<HTMLCanvasElement | null>(null)
 const bloodWordRef = ref<HTMLElement | null>(null)
+const quoteWrapperRef = ref<HTMLElement | null>(null)
+const terminalRef = ref<HTMLElement | null>(null)
 
 let dropletRafId: number | null = null
 let sliceRafId: number | null = null
-let sectionVisible = false  // IntersectionObserver gate for both RAF loops
+let sectionVisible = false
 let sectionObserver: IntersectionObserver | null = null
+let mouseRafId: number | null = null
+let pendingMouse: MouseEvent | null = null
 
 const scrollToSection = (id: string) => {
   const el = document.getElementById(id)
@@ -87,16 +84,6 @@ const scrollToSection = (id: string) => {
   }
 }
 
-// 1. 3D Parallax Tilt State
-const tiltX = ref(0)
-const tiltY = ref(0)
-
-// 2. Kinetic Variable Font Proximity States
-const kineticWeight = ref(900)
-const kineticSpacing = ref(-0.04)
-const kineticScale = ref(1)
-
-// 3. Blade Slice Tracking
 const isMouseDown = ref(false)
 let lastMouseX = 0
 let lastMouseY = 0
@@ -127,14 +114,31 @@ function updateBloodHover(mx: number, my: number) {
 }
 
 function handleMouseMove(e: MouseEvent) {
+  pendingMouse = e
+  if (mouseRafId !== null) return
+  mouseRafId = requestAnimationFrame(flushMouseMove)
+}
+
+function flushMouseMove() {
+  mouseRafId = null
+  const e = pendingMouse
+  if (!e) return
+  pendingMouse = null
+
   const { innerWidth, innerHeight } = window
   const mouseX = e.clientX
   const mouseY = e.clientY
 
-  tiltX.value = (-(mouseY - innerHeight / 2) / (innerHeight / 2)) * 8
-  tiltY.value = ((mouseX - innerWidth / 2) / (innerWidth / 2)) * 8
+  const tiltX = (-(mouseY - innerHeight / 2) / (innerHeight / 2)) * 8
+  const tiltY = ((mouseX - innerWidth / 2) / (innerWidth / 2)) * 8
+  if (quoteWrapperRef.value) {
+    quoteWrapperRef.value.style.transform = `perspective(1200px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`
+  }
+  if (terminalRef.value) {
+    terminalRef.value.style.transform = `perspective(1200px) rotateX(${tiltX * -0.3}deg) rotateY(${tiltY * -0.3}deg)`
+  }
 
-  updateKineticFont(mouseX, mouseY, bloodWordRef.value, kineticWeight, kineticSpacing, kineticScale)
+  updateKineticFont(mouseX, mouseY, bloodWordRef.value)
   updateBloodHover(mouseX, mouseY)
 
   const dx = mouseX - lastMouseX
@@ -161,16 +165,10 @@ function handleMouseMove(e: MouseEvent) {
 
   lastMouseX = mouseX
   lastMouseY = mouseY
+  ensureSliceLoop()
 }
 
-function updateKineticFont(
-  mx: number,
-  my: number,
-  el: HTMLElement | null,
-  weightRef: { value: number },
-  spacingRef: { value: number },
-  scaleRef: { value: number }
-) {
+function updateKineticFont(mx: number, my: number, el: HTMLElement | null) {
   if (!el) return
   const rect = el.getBoundingClientRect()
   const cx = rect.left + rect.width / 2
@@ -180,13 +178,13 @@ function updateKineticFont(
   const maxDist = 280
   if (dist < maxDist) {
     const factor = 1 - dist / maxDist
-    weightRef.value = Math.round(900 + factor * 100)
-    spacingRef.value = -0.04 + factor * 0.08
-    scaleRef.value = 1 + factor * 0.07
+    el.style.fontWeight = String(Math.round(900 + factor * 100))
+    el.style.letterSpacing = `${-0.04 + factor * 0.08}em`
+    el.style.transform = `scale(${1 + factor * 0.07})`
   } else {
-    weightRef.value = 900
-    spacingRef.value = -0.04
-    scaleRef.value = 1
+    el.style.fontWeight = '900'
+    el.style.letterSpacing = '-0.04em'
+    el.style.transform = 'scale(1)'
   }
 }
 
@@ -234,56 +232,77 @@ function initDroplets() {
   }
 }
 
+function ensureDropletLoop() {
+  if (dropletRafId !== null) return
+  dropletRafId = requestAnimationFrame(renderDroplets)
+}
+
 function renderDroplets() {
   const canvas = dropletsCanvasRef.value
-  if (!canvas) return
+  if (!canvas) {
+    dropletRafId = null
+    return
+  }
   const ctx = canvas.getContext('2d')
-  if (!ctx) return
+  if (!ctx) {
+    dropletRafId = null
+    return
+  }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-  if (isBloodHovered.value && sectionVisible) {
-    // Performance: reset shadow once before loop — avoids leaking shadow state
-    // to subsequent draws. shadowBlur removed from per-droplet path: it forces
-    // a GPU blur composite per draw call at 60fps which is the heaviest cost here.
-    ctx.shadowColor = 'transparent'
-    ctx.shadowBlur = 0
-
-    droplets.forEach(d => {
-      d.y += d.speed
-
-      if (d.y > canvas.height + 40) {
-        d.y = -30
-        d.x = Math.random() * canvas.width
-      }
-
-      ctx.save()
-      ctx.globalAlpha = d.opacity
-      ctx.fillStyle = d.color
-
-      ctx.beginPath()
-      ctx.arc(d.x, d.y, d.radius, 0, Math.PI)
-      ctx.lineTo(d.x, d.y - d.length)
-      ctx.closePath()
-      ctx.fill()
-
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
-      ctx.beginPath()
-      ctx.arc(d.x - d.radius * 0.3, d.y - d.radius * 0.15, d.radius * 0.32, 0, Math.PI * 2)
-      ctx.fill()
-
-      ctx.restore()
-    })
+  if (!isBloodHovered.value || !sectionVisible) {
+    dropletRafId = null
+    return
   }
 
+  ctx.shadowColor = 'transparent'
+  ctx.shadowBlur = 0
+
+  for (let i = 0; i < droplets.length; i++) {
+    const d = droplets[i]
+    d.y += d.speed
+
+    if (d.y > canvas.height + 40) {
+      d.y = -30
+      d.x = Math.random() * canvas.width
+    }
+
+    ctx.globalAlpha = d.opacity
+    ctx.fillStyle = d.color
+    ctx.beginPath()
+    ctx.arc(d.x, d.y, d.radius, 0, Math.PI)
+    ctx.lineTo(d.x, d.y - d.length)
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
+    ctx.beginPath()
+    ctx.arc(d.x - d.radius * 0.3, d.y - d.radius * 0.15, d.radius * 0.32, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.globalAlpha = 1
   dropletRafId = requestAnimationFrame(renderDroplets)
+}
+
+function ensureSliceLoop() {
+  if (sliceRafId !== null) return
+  if (!sliceTrail.length && !sliceParticles.length) return
+  sliceRafId = requestAnimationFrame(renderSliceCanvas)
 }
 
 function renderSliceCanvas() {
   const canvas = sliceCanvasRef.value
-  if (!canvas) return
+  if (!canvas) {
+    sliceRafId = null
+    return
+  }
   const ctx = canvas.getContext('2d')
-  if (!ctx) return
+  if (!ctx) {
+    sliceRafId = null
+    return
+  }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -303,8 +322,11 @@ function renderSliceCanvas() {
     }
     ctx.stroke()
     ctx.restore()
-    
+
     sliceTrail = sliceTrail.filter(p => p.alpha > 0)
+  } else if (sliceTrail.length === 1) {
+    sliceTrail[0].alpha -= 0.04
+    if (sliceTrail[0].alpha <= 0) sliceTrail = []
   }
 
   for (let i = sliceParticles.length - 1; i >= 0; i--) {
@@ -316,40 +338,44 @@ function renderSliceCanvas() {
     if (pt.life <= 0) {
       sliceParticles.splice(i, 1)
     } else {
-      ctx.save()
       ctx.globalAlpha = Math.max(0, pt.life)
       ctx.fillStyle = pt.color
       ctx.shadowColor = pt.color
       ctx.shadowBlur = 8
       ctx.fillRect(pt.x - 1.5, pt.y - 1.5, 3, 3)
-      ctx.restore()
     }
   }
+  ctx.globalAlpha = 1
+  ctx.shadowBlur = 0
 
-  sliceRafId = requestAnimationFrame(renderSliceCanvas)
+  if (sliceTrail.length || sliceParticles.length) {
+    sliceRafId = requestAnimationFrame(renderSliceCanvas)
+  } else {
+    sliceRafId = null
+  }
 }
 
 function handleResize() {
   initDroplets()
 }
 
+watch(isBloodHovered, (hovered) => {
+  if (hovered && sectionVisible) ensureDropletLoop()
+})
+
 onMounted(() => {
-  window.addEventListener('resize', handleResize)
+  window.addEventListener('resize', handleResize, { passive: true })
   setTimeout(() => {
     initDroplets()
   }, 100)
-  dropletRafId = requestAnimationFrame(renderDroplets)
-  sliceRafId = requestAnimationFrame(renderSliceCanvas)
 
-  // Gate both RAF loops via IntersectionObserver.
-  // When BloodQuote is off-screen the loops still run but immediately return
-  // after clearRect — which is cheap. However, when sectionVisible is false
-  // we can skip even that. The loops are kept alive so they resume instantly
-  // on re-entry without needing to restart RAF chains.
   const el = dropletsCanvasRef.value?.parentElement
   if (el) {
     sectionObserver = new IntersectionObserver(
-      ([entry]) => { sectionVisible = entry.isIntersecting },
+      ([entry]) => {
+        sectionVisible = entry.isIntersecting
+        if (sectionVisible && isBloodHovered.value) ensureDropletLoop()
+      },
       { rootMargin: '100px 0px' }
     )
     sectionObserver.observe(el)
@@ -359,6 +385,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (dropletRafId) cancelAnimationFrame(dropletRafId)
   if (sliceRafId) cancelAnimationFrame(sliceRafId)
+  if (mouseRafId) cancelAnimationFrame(mouseRafId)
   sectionObserver?.disconnect()
   window.removeEventListener('resize', handleResize)
 })

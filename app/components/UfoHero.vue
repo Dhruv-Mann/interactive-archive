@@ -161,13 +161,14 @@ const containerRef = ref<HTMLDivElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let rafId = 0
 let ro: ResizeObserver | null = null
+let cleanup: (() => void) | null = null
 
 onMounted(() => {
   const canvas = canvasRef.value
   const container = containerRef.value
   if (!canvas || !container) return
 
-  const ctx = canvas.getContext("2d")
+  const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true })
   if (!ctx) return
 
   let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -844,8 +845,12 @@ onMounted(() => {
 
   // ─── Main Loop ─────────────────────────────────────────────────────────────
   let lastTime = performance.now(), time = 0
+  let loopRunning = false
+  let inView = true
+  let visObserver: IntersectionObserver | null = null
 
   function frame(now: number) {
+    if (!loopRunning) return
     const dt = Math.min((now - lastTime) / 1000, 0.05)
     lastTime = now; time += dt
 
@@ -870,14 +875,52 @@ onMounted(() => {
     rafId = requestAnimationFrame(frame)
   }
 
+  function startLoop() {
+    if (loopRunning) return
+    loopRunning = true
+    lastTime = performance.now()
+    rafId = requestAnimationFrame(frame)
+  }
+
+  function stopLoop() {
+    loopRunning = false
+    cancelAnimationFrame(rafId)
+    rafId = 0
+  }
+
+  function syncLoop() {
+    const tabVisible = document.visibilityState === 'visible'
+    if (inView && tabVisible) startLoop()
+    else stopLoop()
+  }
+
+  visObserver = new IntersectionObserver(
+    ([entry]) => {
+      inView = entry.isIntersecting
+      syncLoop()
+    },
+    { rootMargin: '20% 0px', threshold: 0 },
+  )
+  visObserver.observe(container)
+  document.addEventListener('visibilitychange', syncLoop)
+
   initialized = true
   layoutAllText()
-  rafId = requestAnimationFrame(frame)
+  startLoop()
 
+  cleanup = () => {
+    stopLoop()
+    visObserver?.disconnect()
+    document.removeEventListener('visibilitychange', syncLoop)
+    canvas.removeEventListener("pointermove", onMove)
+    canvas.removeEventListener("pointerdown", onDown)
+    window.removeEventListener("pointerup", onUp)
+    if (ro) ro.disconnect()
+  }
 })
 
 onUnmounted(() => {
-  cancelAnimationFrame(rafId)
-  if (ro) ro.disconnect()
+  cleanup?.()
+  cleanup = null
 })
 </script>

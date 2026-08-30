@@ -31,7 +31,9 @@ const currentIndex = computed(() => {
   return ((step.value % features.length) + features.length) % features.length
 })
 
-let interval: ReturnType<typeof setInterval>
+let interval: ReturnType<typeof setInterval> | undefined
+let sectionObserver: IntersectionObserver | null = null
+const rootRef = ref<HTMLElement | null>(null)
 
 const nextStep = () => {
   step.value++
@@ -42,14 +44,35 @@ const handleChipClick = (index: number) => {
   if (diff > 0) step.value += diff
 }
 
-onMounted(() => {
+function startAutoplay() {
+  if (interval) return
   interval = setInterval(() => {
     if (!isPaused.value) nextStep()
   }, AUTO_PLAY_INTERVAL)
+}
+
+function stopAutoplay() {
+  if (!interval) return
+  clearInterval(interval)
+  interval = undefined
+}
+
+onMounted(() => {
+  if (rootRef.value) {
+    sectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) startAutoplay()
+        else stopAutoplay()
+      },
+      { rootMargin: '10% 0px', threshold: 0 },
+    )
+    sectionObserver.observe(rootRef.value)
+  }
 })
 
 onUnmounted(() => {
-  clearInterval(interval)
+  stopAutoplay()
+  sectionObserver?.disconnect()
 })
 
 const getCardStatus = (index: number) => {
@@ -68,7 +91,7 @@ const getCardStatus = (index: number) => {
 </script>
 
 <template>
-  <div class="w-full overflow-x-hidden bg-[#07070A] py-20 relative">
+  <div ref="rootRef" class="w-full overflow-x-hidden bg-[#07070A] py-20 relative">
     
     <div class="w-full max-w-7xl mx-auto px-4 md:px-8">
       <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[4rem] flex flex-col lg:flex-row min-h-[600px] lg:aspect-video border-2 border-white/10 bg-[#07070A] shadow-[0_0_50px_rgba(255,42,95,0.05)]">
@@ -188,8 +211,6 @@ const getCardStatus = (index: number) => {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;900&family=Archivo+Black&display=swap');
-
 .premium-font { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.03em; }
 .display-font { font-family: 'Archivo Black', sans-serif; letter-spacing: 0.1em; }
 </style>

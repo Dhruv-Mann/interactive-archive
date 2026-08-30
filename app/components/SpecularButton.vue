@@ -137,7 +137,7 @@ onMounted(() => {
   const fx = fxRef.value;
   if (!btn || !fx) return;
 
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true, dpr });
   const gl = renderer.gl;
   gl.clearColor(0, 0, 0, 0);
@@ -216,11 +216,22 @@ onMounted(() => {
   let bright = 0;
   let last = performance.now();
   let raf = 0;
+  let inView = true;
+  let loopRunning = false;
+  let wasDrawn = false;
 
   const lineC = new Color();
   const baseC = new Color();
+  lineC.set(props.lineColor);
+  baseC.set(props.baseColor);
+  program.uniforms.uLineColor.value = [lineC.r, lineC.g, lineC.b];
+  program.uniforms.uBaseColor.value = [baseC.r, baseC.g, baseC.b];
+  program.uniforms.uShineSize.value = (props.shineSize * Math.PI) / 180;
+  program.uniforms.uShineFade.value = (props.shineFade * Math.PI) / 180;
+  program.uniforms.uThickness.value = props.thickness * dpr;
 
   const update = (now: number) => {
+    if (!loopRunning) return;
     raf = requestAnimationFrame(update);
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
@@ -231,26 +242,57 @@ onMounted(() => {
     const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
     angle += diff * (1 - Math.exp(-dt * 7));
 
-    // Shine fades in with pointer proximity unless autoAnimate keeps it on
     const brightTarget = props.autoAnimate ? 1 : proximityT;
     bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8));
 
-    lineC.set(props.lineColor);
-    baseC.set(props.baseColor);
     program.uniforms.uAngle.value = angle;
     program.uniforms.uRadius.value = Math.min(props.radius, Math.min(sizeRef.w, sizeRef.h) / 2) * dpr;
-    program.uniforms.uLineColor.value = [lineC.r, lineC.g, lineC.b];
-    program.uniforms.uBaseColor.value = [baseC.r, baseC.g, baseC.b];
     program.uniforms.uIntensity.value = props.intensity * bright;
-    program.uniforms.uShineSize.value = (props.shineSize * Math.PI) / 180;
-    program.uniforms.uShineFade.value = (props.shineFade * Math.PI) / 180;
-    program.uniforms.uThickness.value = props.thickness * dpr;
+
+    if (bright < 0.001 && !props.autoAnimate) {
+      if (wasDrawn) {
+        renderer.render({ scene: mesh });
+        wasDrawn = false;
+      }
+      return;
+    }
+
+    wasDrawn = true;
     renderer.render({ scene: mesh });
   };
-  raf = requestAnimationFrame(update);
+
+  const startLoop = () => {
+    if (loopRunning) return;
+    loopRunning = true;
+    last = performance.now();
+    raf = requestAnimationFrame(update);
+  };
+  const stopLoop = () => {
+    loopRunning = false;
+    cancelAnimationFrame(raf);
+    raf = 0;
+  };
+  const syncLoop = () => {
+    const tabVisible = document.visibilityState === 'visible';
+    if (inView && tabVisible) startLoop();
+    else stopLoop();
+  };
+
+  const vis = new IntersectionObserver(
+    ([entry]) => {
+      inView = entry.isIntersecting;
+      syncLoop();
+    },
+    { rootMargin: '20% 0px', threshold: 0 },
+  );
+  vis.observe(btn);
+  document.addEventListener('visibilitychange', syncLoop);
+  startLoop();
 
   onUnmounted(() => {
-    cancelAnimationFrame(raf);
+    stopLoop();
+    vis.disconnect();
+    document.removeEventListener('visibilitychange', syncLoop);
     ro.disconnect();
     window.removeEventListener('pointermove', onPointerMove);
     if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);

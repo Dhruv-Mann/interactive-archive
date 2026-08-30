@@ -13,7 +13,7 @@
       <NewLandingHero />
 
       <!-- Timeline Light Beam Connector 0 -->
-      <div class="h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
+      <div class="timeline-spacer h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
         
         <!-- 1. Top Center-Left (Hand Level) -->
         <div class="absolute top-[15%] right-[52vw] flex flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-right z-20">
@@ -56,11 +56,12 @@
       <PoemHero />
       
       <!-- Timeline Light Beam Connector 1 -->
-      <div class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+      <div class="timeline-spacer h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
         <!-- Dithered image container -->
         <div 
+          ref="spacer1WrapRef"
           class="absolute left-[8vw] flex items-center justify-center pointer-events-none"
-          :style="{ opacity: spacer1ImageOpacity }"
+          style="opacity: 0"
         >
 
           <img 
@@ -138,8 +139,9 @@
         <!-- ASCII Canvas Container: v-if unmounts Three.js when off-screen (kills its RAF loop) -->
         <div 
           v-if="isAsciiMounted"
+          ref="spacer2AsciiRef"
           class="absolute inset-0 flex items-center justify-center pointer-events-auto"
-          :style="{ opacity: spacer2AsciiOpacity }"
+          style="opacity: 0"
         >
           <AsciiText text="NEXUS" :asciiFontSize="8" :textFontSize="200" :planeBaseHeight="5.6" />
         </div>
@@ -154,11 +156,12 @@
       <BloodQuote />
 
       <!-- Timeline Light Beam Connector 3 -->
-      <div id="connector-3" class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+      <div id="connector-3" class="timeline-spacer h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
         <!-- ASCII lion skull — right side, screen strips black, mask dissolves edges -->
         <div
+          ref="spacer3WrapRef"
           class="absolute right-[4vw] flex items-center justify-center pointer-events-none"
-          :style="{ opacity: spacer3ImageOpacity }"
+          style="opacity: 0"
         >
           <img
             ref="spacer3ImageRef"
@@ -183,11 +186,12 @@
       <TeamMembers id="core-syndicate" />
 
       <!-- Timeline Light Beam Connector 4 -->
-      <div class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+      <div class="timeline-spacer h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
         <!-- ASCII lion skull — screen mode strips black, radial mask dissolves edges -->
         <div
+          ref="spacer4WrapRef"
           class="absolute left-[4vw] flex items-center justify-center pointer-events-none"
-          :style="{ opacity: spacer4ImageOpacity }"
+          style="opacity: 0"
         >
           <img
             ref="spacer4ImageRef"
@@ -228,7 +232,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import NewLandingHero from './NewLandingHero.vue'
 import PoemHero from './PoemHero.vue'
 import UfoHero from './UfoHero.vue'
@@ -238,31 +242,29 @@ import EventsSection from './EventsSection.vue'
 import AsciiText from './AsciiText.vue'
 import { useLenis } from '~/composables/useLenis'
 
-useLenis() // Smooth scroll — bridges Lenis to GSAP ScrollTrigger globally
+useLenis()
 const toastMessage = ref<string | null>(null)
 
-// Removed Lissajous logic to replace with horizontal CHAOS animation
-
-// Spacer 1 Reveal Animation Logic
 const spacer1ImageRef = ref<HTMLImageElement | null>(null)
-const spacer1ImageOpacity = ref(0)
-const spacer1ImageRotation = ref(0)
+const spacer1WrapRef = ref<HTMLElement | null>(null)
 const spacer3ImageRef = ref<HTMLImageElement | null>(null)
-const spacer3ImageOpacity = ref(0)
+const spacer3WrapRef = ref<HTMLElement | null>(null)
 const spacer4ImageRef = ref<HTMLImageElement | null>(null)
-const spacer4ImageOpacity = ref(0)
-const spacer2AsciiOpacity = ref(0)
+const spacer4WrapRef = ref<HTMLElement | null>(null)
+const spacer2AsciiRef = ref<HTMLElement | null>(null)
 
-// WebGL visibility gate — v-if unmounts Three.js when off-screen,
-// completely halting its RAF loop and freeing GPU budget during scrolling.
 const isAsciiMounted = ref(false)
 
-// RAF-throttled scroll handler: getBoundingClientRect is expensive at 60fps.
-// We gate it to one call per animation frame maximum.
 let scrollRafId: number | null = null
+let webglObserver: IntersectionObserver | null = null
+
+const setOpacity = (el: HTMLElement | null | undefined, value: number) => {
+  if (!el) return
+  el.style.opacity = String(value)
+}
 
 const handleScroll = () => {
-  if (scrollRafId !== null) return  // Already queued for this frame
+  if (scrollRafId !== null) return
   scrollRafId = requestAnimationFrame(() => {
     scrollRafId = null
     _doScrollCalc()
@@ -271,54 +273,38 @@ const handleScroll = () => {
 
 const _doScrollCalc = () => {
   const windowCenterY = window.innerHeight / 2
+  const maxDistance = window.innerHeight * 0.6
 
   if (spacer1ImageRef.value) {
     const rect = spacer1ImageRef.value.getBoundingClientRect()
-    const centerY = rect.top + rect.height / 2
-    
-    // Calculate distance from center of screen
-    const distance = Math.abs(centerY - windowCenterY)
-    const maxDistance = window.innerHeight * 0.6 // Starts fading when it's 60% away from center
-    
-    // Map distance to opacity (max 0.6)
+    const distance = Math.abs(rect.top + rect.height / 2 - windowCenterY)
     const factor = 1 - (distance / maxDistance)
-    spacer1ImageOpacity.value = Math.max(0, Math.min(0.6, factor * 0.8))
-    
-    // Removed Lissajous spin logic
+    setOpacity(spacer1WrapRef.value, Math.max(0, Math.min(0.6, factor * 0.8)))
   }
 
   const spacer2Element = document.getElementById('connector-2')
   if (spacer2Element) {
     const rect2 = spacer2Element.getBoundingClientRect()
-    const centerY2 = rect2.top + rect2.height / 2
-    
-    const distance2 = Math.abs(centerY2 - windowCenterY)
-    const maxDistance2 = window.innerHeight * 0.6
-    
-    const factor2 = 1 - (distance2 / maxDistance2)
-    spacer2AsciiOpacity.value = Math.max(0, Math.min(1.0, factor2 * 1.5))
+    const distance2 = Math.abs(rect2.top + rect2.height / 2 - windowCenterY)
+    const factor2 = 1 - (distance2 / maxDistance)
+    setOpacity(spacer2AsciiRef.value, Math.max(0, Math.min(1.0, factor2 * 1.5)))
   }
 
-  // Spacer 3 — ascii lion skull (left side, after BloodQuote)
   if (spacer3ImageRef.value) {
     const rect3 = spacer3ImageRef.value.getBoundingClientRect()
-    const centerY3 = rect3.top + rect3.height / 2
-    const distance3 = Math.abs(centerY3 - windowCenterY)
-    const maxDistance3 = window.innerHeight * 0.6
-    const factor3 = 1 - (distance3 / maxDistance3)
-    spacer3ImageOpacity.value = Math.max(0, Math.min(0.7, factor3 * 0.9))
+    const distance3 = Math.abs(rect3.top + rect3.height / 2 - windowCenterY)
+    const factor3 = 1 - (distance3 / maxDistance)
+    setOpacity(spacer3WrapRef.value, Math.max(0, Math.min(0.7, factor3 * 0.9)))
   }
 
-  // Spacer 4 — dithered statue (right side, after TeamMembers)
   if (spacer4ImageRef.value) {
     const rect4 = spacer4ImageRef.value.getBoundingClientRect()
-    const centerY4 = rect4.top + rect4.height / 2
-    const distance4 = Math.abs(centerY4 - windowCenterY)
-    const maxDistance4 = window.innerHeight * 0.6
-    const factor4 = 1 - (distance4 / maxDistance4)
-    spacer4ImageOpacity.value = Math.max(0, Math.min(0.65, factor4 * 0.85))
+    const distance4 = Math.abs(rect4.top + rect4.height / 2 - windowCenterY)
+    const factor4 = 1 - (distance4 / maxDistance)
+    setOpacity(spacer4WrapRef.value, Math.max(0, Math.min(0.65, factor4 * 0.85)))
   }
 }
+
 const handleRsvpToast = (eventTitle: string) => {
   toastMessage.value = `PASS RESERVED: ${eventTitle}! SEE YOU AFTER HOURS.`
   setTimeout(() => {
@@ -326,33 +312,32 @@ const handleRsvpToast = (eventTitle: string) => {
   }, 4000)
 }
 
-
 onMounted(() => {
-  if (typeof window !== 'undefined') {
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+  if (typeof window === 'undefined') return
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  handleScroll()
 
-    // IntersectionObserver: mount AsciiText only when near viewport.
-    // rootMargin '200%' = start mounting when within 2 screen heights.
-    const webglObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if ((entry.target as HTMLElement).id === 'connector-2') {
-            isAsciiMounted.value = entry.isIntersecting
-          }
-        })
-      },
-      { rootMargin: '200% 0px', threshold: 0 }
-    )
+  webglObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if ((entry.target as HTMLElement).id === 'connector-2') {
+          isAsciiMounted.value = entry.isIntersecting
+        }
+      })
+    },
+    { rootMargin: '40% 0px', threshold: 0 }
+  )
 
-    const c2 = document.getElementById('connector-2')
-    if (c2) webglObserver.observe(c2)
-  }
+  const c2 = document.getElementById('connector-2')
+  if (c2) webglObserver.observe(c2)
 })
 
 onUnmounted(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('scroll', handleScroll)
   }
+  if (scrollRafId !== null) cancelAnimationFrame(scrollRafId)
+  webglObserver?.disconnect()
+  webglObserver = null
 })
 </script>

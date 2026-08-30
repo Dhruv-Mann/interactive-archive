@@ -17,6 +17,7 @@
             :loop="true"
             :speed="1200"
             class="hero-bg-swiper"
+            @swiper="onSwiper"
           >
             <SwiperSlide v-for="(src, i) in teamImages" :key="i" class="relative overflow-hidden">
               <img
@@ -96,6 +97,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import type { Swiper as SwiperType } from 'swiper'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -129,6 +131,12 @@ const duplicateIconEls = ref<HTMLElement[]>([])
 let duplicateIcons: HTMLElement[] | null = null
 let textAnimationOrder: { segment: HTMLElement; originalIndex: number }[] = []
 let mm: gsap.MatchMedia
+let swiperInst: SwiperType | null = null
+let swiperObserver: IntersectionObserver | null = null
+
+const onSwiper = (instance: SwiperType) => {
+  swiperInst = instance
+}
 
 onMounted(async () => {
   await nextTick()
@@ -347,11 +355,24 @@ onMounted(async () => {
       }
     })
   })
+
+  if (heroSectionRef.value) {
+    swiperObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (!swiperInst?.autoplay) return
+        if (entry.isIntersecting) swiperInst.autoplay.start()
+        else swiperInst.autoplay.stop()
+      },
+      { rootMargin: '10% 0px', threshold: 0 },
+    )
+    swiperObserver.observe(heroSectionRef.value)
+  }
 })
 
 onUnmounted(() => {
   if (mm) mm.revert()
-  ScrollTrigger.getAll().forEach((t) => t.kill())
+  swiperObserver?.disconnect()
+  swiperObserver = null
   if (duplicateIcons) {
     duplicateIcons.forEach((d) => d.parentNode?.removeChild(d))
   }
@@ -359,8 +380,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;900&family=Archivo+Black&display=swap');
-
 .premium-font { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.03em; }
 .display-font { font-family: 'Archivo Black', sans-serif; letter-spacing: 0.1em; }
 
