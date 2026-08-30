@@ -15,6 +15,10 @@
       <!-- Timeline Light Beam Connector 0 -->
       <div class="h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
         
+        <!-- 1. Top Center-Left (Hand Level) -->
+        <div class="absolute top-[15%] right-[52vw] flex flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-right z-20">
+          <span>[01] Initiating unmanaged protocol.</span>
+        </div>
         <!-- Background ASCII Art (PNG) -->
         <div class="absolute inset-0 flex items-center justify-center z-0 opacity-70">
           <img 
@@ -33,6 +37,19 @@
           class="h-full w-[2px] z-10"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
+
+        <!-- Lissajous Beams Overlay (Originating at hand, curving around, converging at bottom) -->
+        <LissajousBeams :origin-x="0.5" :origin-y="0.26" />
+
+        <!-- 2. Middle Right (Max Expansion Level, pushed outside the curve) -->
+        <div class="absolute top-[63%] left-[82vw] flex flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-left z-20">
+          <span>[02] Chaos at it's peak.</span>
+        </div>
+
+        <!-- 3. Bottom Center-Right (Convergence Level) -->
+        <div class="absolute bottom-[2%] left-[60vw] flex flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-left z-20">
+          <span>[03] Managing the unmanagable.</span>
+        </div>
       </div>
 
       <!-- 1. 3D Poem Hero Room -->
@@ -87,9 +104,9 @@
 
       <!-- Timeline Light Beam Connector 3 -->
       <div id="connector-3" class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
-        <!-- ASCII lion skull — left side, screen strips black, mask dissolves edges -->
+        <!-- ASCII lion skull — right side, screen strips black, mask dissolves edges -->
         <div
-          class="absolute left-[4vw] flex items-center justify-center pointer-events-none"
+          class="absolute right-[4vw] flex items-center justify-center pointer-events-none"
           :style="{ opacity: spacer3ImageOpacity }"
         >
           <img
@@ -118,7 +135,7 @@
       <div class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
         <!-- ASCII lion skull — screen mode strips black, radial mask dissolves edges -->
         <div
-          class="absolute right-[4vw] flex items-center justify-center pointer-events-none"
+          class="absolute left-[4vw] flex items-center justify-center pointer-events-none"
           :style="{ opacity: spacer4ImageOpacity }"
         >
           <img
