@@ -49,7 +49,7 @@
 
         <!-- 3. Bottom label — repositioned on mobile to stay in-bounds -->
         <div class="absolute bottom-[4%] left-[5vw] sm:left-[60vw] flex flex-col gap-3 text-[10px] sm:text-[12px] font-mono text-zinc-400 tracking-[0.15em] sm:tracking-[0.2em] uppercase text-left z-20">
-          <span>Managing the unmanagable.</span>
+          <span>{{ isMobile ? 'Managing the unmanagable.' : '[03] Managing the unmanagable.' }}</span>
         </div>
       </div>
 
