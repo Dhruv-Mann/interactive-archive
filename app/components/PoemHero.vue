@@ -80,12 +80,20 @@ const poemHTML = computed((): string => {
 const contentRef = ref<HTMLElement | null>(null)
 
 const adjustContentSize = (): void => {
-  if (!contentRef.value || typeof window === 'undefined') return
+  if (!contentRef.value || !heroSectionRef.value || typeof window === 'undefined') return
   const viewportWidth = window.innerWidth
   const scaleFactor = viewportWidth < 1000
     ? (viewportWidth / 1000) * 0.9
     : Math.min(1, viewportWidth / 1100)
+  
   contentRef.value.style.transform = `scale(${scaleFactor})`
+
+  // Dynamically shrink the massive 100dvh container on mobile to perfectly fit the scaled 562px content
+  if (viewportWidth < 640) {
+    heroSectionRef.value.style.height = `${562 * scaleFactor + 60}px` // +60px for a tiny bit of breathing room
+  } else {
+    heroSectionRef.value.style.height = `100dvh`
+  }
 }
 
 // ─── JavaScript rAF Animation (Direct DOM Bypass) ────────────────────────────────
