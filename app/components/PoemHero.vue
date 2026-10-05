@@ -67,7 +67,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRafWhenVisible } from '~/composables/useRafWhenVisible'
 
 // ─── Poem HTML ───────────────────────────────────────────────────────────────
-const PHRASE_HTML = '<span class="brand-red">NEXUS</span> — A collective where digital passion is born   ✶   '
+const PHRASE_HTML = '<span class="brand-red">UNMANAGED</span> — A collective where digital passion is born   ✶   '
 // Loop is modulo-based; 12 copies (~30k px) covers every face with headroom.
 const REPEAT = 12
 
@@ -440,7 +440,7 @@ onUnmounted(() => {
   animation-delay: -6s;
 }
 
-/* Red brand highlight for NEXUS — no glow, just a clean vivid red */
+/* Red brand highlight for UNMANAGED — no glow, just a clean vivid red */
 .face.text :deep(.brand-red) {
   color: #ff2255;
   text-shadow: none;

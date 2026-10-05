@@ -1,5 +1,5 @@
 /**
- * NEXUS — Static Data Constants
+ * UNMANAGED — Static Data Constants
  *
  * All placeholder data for the template.
  * Organized by domain. Never scatter raw data inside components.
@@ -286,7 +286,7 @@ export const MEMBERSHIP_PLANS: MembershipPlan[] = [
   },
   {
     title: 'Partner',
-    description: 'For organizations and sponsors who want to collaborate with NEXUS.',
+    description: 'For organizations and sponsors who want to collaborate with UNMANAGED.',
     perks: [
       'Brand presence at all events',
       'Co-hosted workshops and sessions',
@@ -312,5 +312,5 @@ export const SOCIAL_LINKS = {
   instagram: '#',
   linkedin: '#',
   twitter: '#',
-  email: 'hello@nexus.dev',
+  email: 'hello@unmanaged.dev',
 } as const

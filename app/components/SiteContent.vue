@@ -3,7 +3,7 @@
     
     <!-- Top Navigation Bar -->
     <div class="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center pointer-events-none mix-blend-difference">
-      <div class="text-white font-bold text-xl tracking-[0.2em] select-none uppercase">NEXUS</div>
+      <div class="text-white font-bold text-xl tracking-[0.2em] select-none uppercase">UNMANAGED</div>
     </div>
 
 
@@ -143,7 +143,7 @@
           class="absolute inset-0 flex items-center justify-center pointer-events-auto"
           style="opacity: 0"
         >
-          <AsciiText text="NEXUS" :asciiFontSize="8" :textFontSize="200" :planeBaseHeight="5.6" />
+          <AsciiText text="UNMANAGED" :asciiFontSize="8" :textFontSize="200" :planeBaseHeight="5.6" />
         </div>
 
         <div 

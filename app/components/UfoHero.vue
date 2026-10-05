@@ -3,7 +3,7 @@
     ref="containerRef"
     class="relative w-full h-[100dvh] overflow-hidden bg-[#722F99]"
     style="touch-action: none;"
-    aria-label="NEXUS UFO Interactive Sequence"
+    aria-label="UNMANAGED UFO Interactive Sequence"
     role="img"
   >
     <canvas ref="canvasRef" class="block w-full h-full" />
@@ -97,7 +97,7 @@ const TUNNEL_FRAGMENTS = [
   "WE PLAY",
   "REDEFINING THE CLUB",
   "MBA COLLECTIVE",
-  "NEXUS FRAMEWORK",
+  "UNMANAGED FRAMEWORK",
   "WE DO EVERYTHING"
 ]
 

@@ -14,13 +14,13 @@ export default defineNuxtConfig({
   ],
   app: {
     head: {
-      title: 'NEXUS',
+      title: 'UNMANAGED',
       titleTemplate: '%s',
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ],
       meta: [
-        { name: 'description', content: 'NEXUS — A high-performance Nuxt 4 creative template.' }
+        { name: 'description', content: 'UNMANAGED — A high-performance Nuxt 4 creative template.' }
       ]
     }
   },
