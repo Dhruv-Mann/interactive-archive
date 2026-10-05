@@ -181,10 +181,12 @@
       </div>
 
       <!-- 3. Blood Quote Section -->
-      <BloodQuote v-if="!isMobile" />
+      <div class="hidden sm:block">
+        <BloodQuote v-if="!isMobile" />
+      </div>
 
       <!-- Timeline Light Beam Connector 3 (also hidden on mobile) -->
-      <div v-if="!isMobile" id="connector-3" class="timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+      <div v-if="!isMobile" id="connector-3" class="hidden sm:flex timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex-col items-center justify-center relative overflow-hidden">
         <!-- ASCII lion skull — centered on mobile, right side on desktop -->
         <div
           ref="spacer3WrapRef"
