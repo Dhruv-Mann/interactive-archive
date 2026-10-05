@@ -11,7 +11,14 @@
       </li>
     </ul>
 
-    <div class="minimap">
+    <!-- Title overlay to fit UNMANAGED Aesthetic -->
+    <div class="absolute top-8 left-6 sm:top-12 sm:left-12 pointer-events-none z-20">
+      <h2 class="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter text-[#FEE7C8] mix-blend-difference">THE SYNDICATE</h2>
+      <p class="text-[#FF9292] font-mono text-xs sm:text-sm tracking-widest mt-2">CLUB ARCHITECTS // INFINITE SCROLL</p>
+    </div>
+
+    <!-- Minimap — hidden on mobile (overflows 340px+ on narrow screens) -->
+    <div class="minimap hidden sm:block">
       <div class="minimap-wrapper">
         <div class="minimap-img-preview">
           <div
@@ -44,12 +51,6 @@
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Title overlay to fit UNMANAGED Aesthetic -->
-    <div class="absolute top-12 left-12 pointer-events-none z-20">
-      <h2 class="text-4xl md:text-6xl font-black tracking-tighter text-[#FEE7C8] mix-blend-difference">THE SYNDICATE</h2>
-      <p class="text-[#FF9292] font-mono text-sm tracking-widest mt-2">CLUB ARCHITECTS // INFINITE SCROLL</p>
     </div>
   </div>
 </template>

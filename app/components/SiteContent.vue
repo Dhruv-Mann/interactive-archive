@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-[#07070A] text-white selection:bg-[#FF2A5F] selection:text-white relative overflow-x-hidden">
     
     <!-- Top Navigation Bar -->
-    <div class="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center pointer-events-none mix-blend-difference">
-      <div class="text-white font-bold text-xl tracking-[0.2em] select-none uppercase">UNMANAGED</div>
+    <div class="fixed top-0 left-0 w-full z-50 px-4 sm:px-6 py-4 sm:py-6 flex justify-between items-center pointer-events-none mix-blend-difference">
+      <div class="text-white font-bold text-base sm:text-xl tracking-[0.2em] select-none uppercase">UNMANAGED</div>
     </div>
 
 
@@ -13,18 +13,19 @@
       <NewLandingHero />
 
       <!-- Timeline Light Beam Connector 0 -->
-      <div class="timeline-spacer h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
+      <div class="timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
         
-        <!-- 1. Top Center-Left (Hand Level) -->
-        <div class="absolute top-[15%] right-[52vw] flex flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-right z-20">
+        <!-- 1. Top label — hidden on mobile to prevent overflow -->
+        <div class="hidden sm:flex absolute top-[15%] right-[52vw] flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-right z-20">
           <span>[01] Initiating unmanaged protocol.</span>
         </div>
+
         <!-- Background ASCII Art (PNG) -->
         <div class="absolute inset-0 flex items-center justify-center z-0 opacity-70">
           <img 
             src="/ascii-art.png" 
             alt="ASCII Art" 
-            class="h-[60vh] w-auto mix-blend-screen object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]"
+            class="h-[50vh] sm:h-[60vh] w-auto mix-blend-screen object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]"
             style="
               -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 50%, black 30%, rgba(0,0,0,0.6) 60%, transparent 85%);
               mask-image: radial-gradient(ellipse 60% 65% at 50% 50%, black 30%, rgba(0,0,0,0.6) 60%, transparent 85%);
@@ -38,16 +39,16 @@
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
 
-        <!-- Lissajous Beams Overlay (Originating at hand, curving around, converging at bottom) -->
-        <LissajousBeams :origin-x="0.5" :origin-y="0.26" />
+        <!-- Lissajous Beams Overlay — hidden on mobile for performance -->
+        <LissajousBeams class="hidden sm:block" :origin-x="0.5" :origin-y="0.26" />
 
-        <!-- 2. Middle Right (Max Expansion Level, pushed outside the curve) -->
-        <div class="absolute top-[63%] left-[82vw] flex flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-left z-20">
+        <!-- 2. Middle Right label — hidden on mobile -->
+        <div class="hidden sm:flex absolute top-[63%] left-[82vw] flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-left z-20">
           <span>[02] Chaos at it's peak.</span>
         </div>
 
-        <!-- 3. Bottom Center-Right (Convergence Level) -->
-        <div class="absolute bottom-[2%] left-[60vw] flex flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-left z-20">
+        <!-- 3. Bottom label — repositioned on mobile to stay in-bounds -->
+        <div class="absolute bottom-[4%] left-[5vw] sm:left-[60vw] flex flex-col gap-3 text-[10px] sm:text-[12px] font-mono text-zinc-400 tracking-[0.15em] sm:tracking-[0.2em] uppercase text-left z-20">
           <span>[03] Managing the unmanagable.</span>
         </div>
       </div>
@@ -56,60 +57,35 @@
       <PoemHero />
       
       <!-- Timeline Light Beam Connector 1 -->
-      <div class="timeline-spacer h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
-        <!-- Dithered image container -->
-        <div 
-          ref="spacer1WrapRef"
-          class="absolute left-[8vw] flex items-center justify-center pointer-events-none"
-          style="opacity: 0"
-        >
-
-          <img 
-            ref="spacer1ImageRef"
-            src="/1-transparent.png" 
-            alt="Dithered Reveal" 
-            class="relative z-10 max-h-[55vh] max-w-[50vw] object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-          />
-        </div>
-        
+      <div class="timeline-spacer w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden"
+           :class="isMobile ? 'min-h-[100dvh]' : 'h-[80vh]'"
+      >
         <!-- The light beam -->
         <div 
-          class="h-full w-[2px] z-10"
+          class="h-full w-[2px] z-10 absolute top-0 bottom-0"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
 
-        <!-- Right Side: Text & Button -->
-        <div class="absolute right-[8vw] flex flex-col items-end justify-center pointer-events-auto z-20 w-[40vw]">
-          
-          <!-- Stacked Typography -->
-          <div class="flex flex-col items-end leading-none" :style="{ fontFamily: '&quot;Marker Felt&quot;, &quot;Comic Sans MS&quot;, cursive' }">
-            <Shuffle
-              text="Not Your"
-              shuffle-direction="right"
-              :duration="0.3"
-              :shuffle-times="1"
-              class="text-4xl text-zinc-400"
-            />
-            <Shuffle
-              text="AVERAGE"
-              shuffle-direction="right"
-              :duration="0.4"
-              :shuffle-times="2"
-              class="text-[6rem] font-black tracking-tighter text-zinc-100 my-2"
-            />
-            <Shuffle
-              text="Club"
-              shuffle-direction="right"
-              :duration="0.3"
-              :shuffle-times="1"
-              class="text-4xl text-zinc-400"
+        <!-- MOBILE layout: stacked vertically, full width -->
+        <div v-if="isMobile" class="relative z-20 flex flex-col items-center justify-center gap-10 w-full px-6 py-16 pointer-events-auto">
+          <!-- Image centered on mobile -->
+          <div ref="spacer1WrapRef" style="opacity: 0">
+            <img 
+              ref="spacer1ImageRef"
+              src="/1-transparent.png" 
+              alt="Dithered Reveal" 
+              class="w-[70vw] max-w-[280px] object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             />
           </div>
-
+          <!-- Text + Button below image -->
+          <div class="flex flex-col items-center text-center" :style="{ fontFamily: '&quot;Marker Felt&quot;, &quot;Comic Sans MS&quot;, cursive' }">
+            <span class="text-2xl text-zinc-400">Not Your</span>
+            <span class="text-[3.5rem] font-black tracking-tighter text-zinc-100 leading-none">AVERAGE</span>
+            <span class="text-2xl text-zinc-400">Club</span>
+          </div>
           <SpecularButton
-            class="mt-8 mr-2"
-            size="lg"
-            :radius="18"
+            size="md"
+            :radius="16"
             tint="#ffffff"
             :tint-opacity="0"
             :blur="0"
@@ -121,29 +97,81 @@
             :shine-fade="40"
             :thickness="1.5"
             :speed="0.35"
-            follow-mouse
-            :proximity="250"
-            :auto-animate="false"
+            :follow-mouse="false"
+            :proximity="200"
+            :auto-animate="true"
           >
             Join the elites
           </SpecularButton>
         </div>
+
+        <!-- DESKTOP layout: left image + right text side by side -->
+        <template v-else>
+          <!-- Dithered image container -->
+          <div 
+            ref="spacer1WrapRef"
+            class="absolute left-[8vw] flex items-center justify-center pointer-events-none"
+            style="opacity: 0"
+          >
+            <img 
+              ref="spacer1ImageRef"
+              src="/1-transparent.png" 
+              alt="Dithered Reveal" 
+              class="relative z-10 max-h-[55vh] max-w-[50vw] object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+            />
+          </div>
+
+          <!-- Right Side: Text & Button -->
+          <div class="absolute right-[8vw] flex flex-col items-end justify-center pointer-events-auto z-20 w-[40vw]">
+            <div class="flex flex-col items-end leading-none" :style="{ fontFamily: '&quot;Marker Felt&quot;, &quot;Comic Sans MS&quot;, cursive' }">
+              <Shuffle text="Not Your" shuffle-direction="right" :duration="0.3" :shuffle-times="1" class="text-4xl text-zinc-400" />
+              <Shuffle text="AVERAGE" shuffle-direction="right" :duration="0.4" :shuffle-times="2" class="text-[6rem] font-black tracking-tighter text-zinc-100 my-2" />
+              <Shuffle text="Club" shuffle-direction="right" :duration="0.3" :shuffle-times="1" class="text-4xl text-zinc-400" />
+            </div>
+            <SpecularButton
+              class="mt-8 mr-2"
+              size="lg"
+              :radius="18"
+              tint="#ffffff"
+              :tint-opacity="0"
+              :blur="0"
+              text-color="#f5f5f5"
+              line-color="#b57edc"
+              base-color="#525252"
+              :intensity="1.2"
+              :shine-size="15"
+              :shine-fade="40"
+              :thickness="1.5"
+              :speed="0.35"
+              follow-mouse
+              :proximity="250"
+              :auto-animate="false"
+            >
+              Join the elites
+            </SpecularButton>
+          </div>
+        </template>
       </div>
 
       <!-- 2. UFO Abduction Credits Interactive Section -->
       <UfoHero />
 
       <!-- Timeline Light Beam Connector 2 -->
-      <div id="connector-2" class="h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+      <div id="connector-2" class="h-[60vh] sm:h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
         
-        <!-- ASCII Canvas Container: v-if unmounts Three.js when off-screen (kills its RAF loop) -->
+        <!-- ASCII Canvas Container: hidden on mobile (too GPU-heavy at small size), unmounted when off-screen -->
         <div 
-          v-if="isAsciiMounted"
+          v-if="isAsciiMounted && !isMobile"
           ref="spacer2AsciiRef"
           class="absolute inset-0 flex items-center justify-center pointer-events-auto"
           style="opacity: 0"
         >
           <AsciiText text="UNMANAGED" :asciiFontSize="8" :textFontSize="200" :planeBaseHeight="5.6" />
+        </div>
+
+        <!-- Mobile replacement: simple glowing text wordmark -->
+        <div v-if="isMobile" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <span class="font-mono text-[8vw] font-black tracking-[0.3em] text-zinc-600 uppercase select-none">UNMANAGED</span>
         </div>
 
         <div 
@@ -156,18 +184,20 @@
       <BloodQuote />
 
       <!-- Timeline Light Beam Connector 3 -->
-      <div id="connector-3" class="timeline-spacer h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
-        <!-- ASCII lion skull — right side, screen strips black, mask dissolves edges -->
+      <div id="connector-3" class="timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+        <!-- ASCII lion skull — centered on mobile, right side on desktop -->
         <div
           ref="spacer3WrapRef"
-          class="absolute right-[4vw] flex items-center justify-center pointer-events-none"
+          class="absolute flex items-center justify-center pointer-events-none"
+          :class="isMobile ? 'inset-0' : 'right-[4vw]'"
           style="opacity: 0"
         >
           <img
             ref="spacer3ImageRef"
             src="/ascii-lion.png"
             alt="ASCII Lion"
-            class="relative z-10 max-h-[65vh] max-w-[50vw] object-contain"
+            class="relative z-10 object-contain"
+            :class="isMobile ? 'max-h-[50vh] max-w-[80vw]' : 'max-h-[65vh] max-w-[50vw]'"
             style="
               mix-blend-mode: screen;
               -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, black 30%, rgba(0,0,0,0.6) 55%, transparent 80%);
@@ -186,18 +216,20 @@
       <TeamMembers id="core-syndicate" />
 
       <!-- Timeline Light Beam Connector 4 -->
-      <div class="timeline-spacer h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
-        <!-- ASCII lion skull — screen mode strips black, radial mask dissolves edges -->
+      <div class="timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+        <!-- Dithered statue — centered on mobile, left side on desktop -->
         <div
           ref="spacer4WrapRef"
-          class="absolute left-[4vw] flex items-center justify-center pointer-events-none"
+          class="absolute flex items-center justify-center pointer-events-none"
+          :class="isMobile ? 'inset-0' : 'left-[4vw]'"
           style="opacity: 0"
         >
           <img
             ref="spacer4ImageRef"
             src="/dithered2.png"
             alt="Dithered Statue"
-            class="relative z-10 max-h-[65vh] max-w-[50vw] object-contain"
+            class="relative z-10 object-contain"
+            :class="isMobile ? 'max-h-[50vh] max-w-[80vw]' : 'max-h-[65vh] max-w-[50vw]'"
             style="
               mix-blend-mode: screen;
               -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 50%, black 30%, rgba(0,0,0,0.6) 55%, transparent 80%);
@@ -244,6 +276,10 @@ import { useLenis } from '~/composables/useLenis'
 
 useLenis()
 const toastMessage = ref<string | null>(null)
+
+// Reactive mobile detection — avoids SSR issues and responds to orientation changes
+const isMobile = ref(false)
+const checkMobile = () => { isMobile.value = window.innerWidth < 640 }
 
 const spacer1ImageRef = ref<HTMLImageElement | null>(null)
 const spacer1WrapRef = ref<HTMLElement | null>(null)
@@ -314,6 +350,9 @@ const handleRsvpToast = (eventTitle: string) => {
 
 onMounted(() => {
   if (typeof window === 'undefined') return
+
+  checkMobile()
+  window.addEventListener('resize', checkMobile, { passive: true })
   window.addEventListener('scroll', handleScroll, { passive: true })
   handleScroll()
 
@@ -335,6 +374,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener('resize', checkMobile)
   }
   if (scrollRafId !== null) cancelAnimationFrame(scrollRafId)
   webglObserver?.disconnect()

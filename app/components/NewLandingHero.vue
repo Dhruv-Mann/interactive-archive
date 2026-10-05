@@ -21,8 +21,8 @@ const fireIntensity = ref(1.0)
 <template>
   <section class="relative h-[100dvh] w-full bg-zinc-950 p-3 sm:p-5 flex items-center justify-center overflow-hidden">
     
-    <!-- Sleek Fire Intensity Slider -->
-    <div class="absolute top-8 right-8 z-50 flex items-center gap-4 bg-black/40 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 shadow-lg">
+    <!-- Sleek Fire Intensity Slider — hidden on mobile to save space -->
+    <div class="hidden sm:flex absolute top-8 right-8 z-50 items-center gap-4 bg-black/40 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 shadow-lg">
       <span class="text-xs font-mono text-zinc-400 tracking-[0.2em] uppercase">Intensity</span>
       <input 
         type="range" 
@@ -39,7 +39,11 @@ const fireIntensity = ref(1.0)
     <HtmlBlaze
       v-bind="props"
       :intensity="fireIntensity"
-      class="w-full max-w-6xl aspect-[21/9] mx-auto border border-white/15 bg-white text-zinc-950 rounded-2xl shadow-2xl"
+      class="w-full max-w-6xl mx-auto border border-white/15 bg-white text-zinc-950 rounded-2xl shadow-2xl"
+      :class="[
+        // On mobile: near-full screen tall card. On wider screens: cinematic 21:9
+        'aspect-[3/4] sm:aspect-[4/3] md:aspect-[21/9]'
+      ]"
     >
       <HtmlEffectDemoSurface
         effect="blaze"

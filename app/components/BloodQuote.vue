@@ -395,7 +395,7 @@ onBeforeUnmount(() => {
 .pink-sweep-sheet {
   position: relative;
   width: 100%;
-  height: 100dvh;
+  min-height: 100dvh;
   z-index: 50;
   background: radial-gradient(circle at 50% 50%, #240b12 0%, #0d0506 65%, #000000 100%);
   border-top: 3px solid #AE3B8B;
@@ -405,7 +405,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 10vh 8vw;
+  padding: 12vh 6vw 6vh;
   overflow: hidden;
   transition: background 0.42s cubic-bezier(0.16, 1, 0.3, 1), 
               border-color 0.42s ease, 
@@ -510,13 +510,26 @@ onBeforeUnmount(() => {
   right: 8vw;
   width: min(90vw, 560px);
   background: rgba(10, 2, 4, 0.85);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 42, 95, 0.3);
   border-radius: 8px;
   z-index: 10;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 42, 95, 0.15);
   overflow: hidden;
   will-change: transform;
+}
+
+/* On very narrow screens: stick to bottom edge, full width minus small margin */
+@media (max-width: 640px) {
+  .terminal-box {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+  }
 }
 
 .terminal-header {
@@ -548,8 +561,8 @@ onBeforeUnmount(() => {
 }
 
 .terminal-body {
-  padding: 28px;
-  font-size: 20px;
+  padding: 20px 24px;
+  font-size: clamp(14px, 3.5vw, 20px);
   color: #E17888;
   line-height: 1.7;
 }
