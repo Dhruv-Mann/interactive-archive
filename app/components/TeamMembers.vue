@@ -34,13 +34,13 @@
       <!-- Animated Icons (Z-index 2) -->
       <div
         ref="animatedIconsRef"
-        class="animated-icons md:fixed relative bottom-auto md:bottom-10 left-auto md:left-1/2 md:-translate-x-1/2 flex flex-wrap md:flex-nowrap items-center justify-center gap-4 md:gap-2 w-[95%] md:w-[60%] will-change-transform z-10 mb-8 md:mb-0"
+        class="animated-icons md:fixed relative bottom-auto md:bottom-10 left-auto md:left-1/2 md:-translate-x-1/2 grid grid-cols-3 md:flex items-center justify-center gap-4 md:gap-2 w-[95%] md:w-[60%] will-change-transform z-10 mb-8 md:mb-0"
       >
         <div
           v-for="(member, index) in teamMembersData"
           :key="index"
           :ref="(el) => { if (el) iconElementsRef[index] = el as HTMLDivElement }"
-          class="animated-icon-wrapper flex-1 flex flex-col items-center gap-3 will-change-transform"
+          class="animated-icon-wrapper w-full md:flex-1 flex flex-col items-center gap-2 md:gap-3 will-change-transform"
         >
           <div class="animated-icon w-full aspect-[3/4] overflow-hidden bg-[#12121A] border border-white/10 shadow-[0_0_15px_rgba(255,42,95,0.2)]">
             <img :src="member.image" :alt="`Team Icon ${index + 1}`" class="w-full h-full object-cover" />
