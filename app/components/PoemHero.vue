@@ -67,7 +67,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRafWhenVisible } from '~/composables/useRafWhenVisible'
 
 // ─── Poem HTML ───────────────────────────────────────────────────────────────
-const PHRASE_HTML = '<span class="brand-red">UNMANAGED</span> — REDEFINING WHAT A TECH CLUB CAN BE   ✶   <span class="brand-red">WE BUILD. WE HOST. WE PLAY.</span>   ✶   '
+const PHRASE_HTML = '<span class="brand-red">UNMANAGED</span> — REDEFINING WHAT A CLUB CAN BE   ✶   <span class="brand-red">WE BUILD. WE HOST. WE PLAY.</span>   ✶   '
 // Loop is modulo-based; 12 copies (~30k px) covers every face with headroom.
 const REPEAT = 12
 
