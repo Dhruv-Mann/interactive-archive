@@ -58,29 +58,29 @@
       </div>
 
       <!-- Text Content (Z-index 10) -->
-      <h1 class="animated-text relative z-20 max-w-[95vw] md:max-w-[70vw] text-center text-white text-[clamp(1.4rem,4vw,3.5rem)] font-black uppercase leading-[1.4] md:leading-[1.2] display-font">
+      <h1 class="animated-text relative z-20 w-full px-2 md:px-0 md:max-w-[70vw] text-center text-white text-[clamp(1.1rem,4.5vw,3.5rem)] font-black uppercase leading-[1.4] md:leading-[1.2] display-font break-words">
         
-        <span :ref="(el) => { if (el) textSegmentsRef[0] = el as HTMLSpanElement }" class="text-segment opacity-0 text-[#FF2A5F] block mb-4 text-[0.4em] tracking-[0.4em] font-bold premium-font">
+        <span :ref="(el) => { if (el) textSegmentsRef[0] = el as HTMLSpanElement }" class="text-segment opacity-0 text-[#FF2A5F] block mb-4 text-[clamp(10px,3vw,14px)] tracking-[0.2em] md:tracking-[0.4em] font-bold premium-font">
           CORE SYNDICATE
         </span>
 
         <span :ref="(el) => { if (el) textSegmentsRef[1] = el as HTMLSpanElement }" class="text-segment opacity-0">MEET THE</span>
-        <div :ref="(el) => { if (el) placeholdersRef[0] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
+        <div :ref="(el) => { if (el) placeholdersRef[0] = el as HTMLDivElement }" class="placeholder-icon mx-1 md:mx-2 md:-mt-2 w-8 h-10 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
 
         <span :ref="(el) => { if (el) textSegmentsRef[2] = el as HTMLSpanElement }" class="text-segment opacity-0">VISIONARIES WHO</span>
-        <div :ref="(el) => { if (el) placeholdersRef[1] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
+        <div :ref="(el) => { if (el) placeholdersRef[1] = el as HTMLDivElement }" class="placeholder-icon mx-1 md:mx-2 md:-mt-2 w-8 h-10 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
 
         <span :ref="(el) => { if (el) textSegmentsRef[3] = el as HTMLSpanElement }" class="text-segment opacity-0">ORCHESTRATE</span>
-        <div :ref="(el) => { if (el) placeholdersRef[2] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
+        <div :ref="(el) => { if (el) placeholdersRef[2] = el as HTMLDivElement }" class="placeholder-icon mx-1 md:mx-2 md:-mt-2 w-8 h-10 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
 
         <span :ref="(el) => { if (el) textSegmentsRef[4] = el as HTMLSpanElement }" class="text-segment opacity-0 text-[#FF2A5F]">ABSOLUTE CHAOS</span>
-        <div :ref="(el) => { if (el) placeholdersRef[3] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
+        <div :ref="(el) => { if (el) placeholdersRef[3] = el as HTMLDivElement }" class="placeholder-icon mx-1 md:mx-2 md:-mt-2 w-8 h-10 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
 
         <span :ref="(el) => { if (el) textSegmentsRef[5] = el as HTMLSpanElement }" class="text-segment opacity-0">INTO A METICULOUSLY</span>
-        <div :ref="(el) => { if (el) placeholdersRef[4] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
+        <div :ref="(el) => { if (el) placeholdersRef[4] = el as HTMLDivElement }" class="placeholder-icon mx-1 md:mx-2 md:-mt-2 w-8 h-10 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
         
         <span :ref="(el) => { if (el) textSegmentsRef[6] = el as HTMLSpanElement }" class="text-segment opacity-0 text-[#B57EDC]">UNMANAGED</span>
-        <div :ref="(el) => { if (el) placeholdersRef[5] = el as HTMLDivElement }" class="placeholder-icon mx-2 md:-mt-2 w-10 h-12 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
+        <div :ref="(el) => { if (el) placeholdersRef[5] = el as HTMLDivElement }" class="placeholder-icon mx-1 md:mx-2 md:-mt-2 w-8 h-10 md:w-16 md:h-20 inline-block align-middle will-change-transform invisible border border-[#FF2A5F]/30 bg-[#07070A]/50"></div>
 
         <span :ref="(el) => { if (el) textSegmentsRef[7] = el as HTMLSpanElement }" class="text-segment opacity-0 block mt-2 text-white">LEGACY.</span>
       </h1>
