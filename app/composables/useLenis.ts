@@ -21,6 +21,10 @@ export function useLenis() {
 
   onMounted(() => {
     gsap.registerPlugin(ScrollTrigger)
+    
+    // Prevent ScrollTrigger from recalculating pins and snapping the scroll position 
+    // every time the mobile address bar hides/shows.
+    ScrollTrigger.config({ ignoreMobileResize: true })
 
     lenis = new Lenis({
       duration: 1.1,

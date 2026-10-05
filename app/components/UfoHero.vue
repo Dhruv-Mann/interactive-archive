@@ -183,9 +183,21 @@ onMounted(() => {
   let lastIsBeaming: boolean | null = null
   let lastGradSc = -1
 
+  let lastW = 0
+  let lastH = 0
   function resize() {
     if (!container || !canvas) return
     const rect = container.getBoundingClientRect()
+    
+    // Ignore minor height changes (like mobile address bar hiding/showing) to prevent resetting the simulation
+    const widthChanged = Math.abs(lastW - rect.width) > 5
+    const heightChanged = Math.abs(lastH - rect.height) > 60
+    
+    if (initialized && !widthChanged && !heightChanged) return
+    
+    lastW = rect.width
+    lastH = rect.height
+
     W = Math.max(1, rect.width)
     H = Math.max(1, rect.height)
     canvas.width = W * dpr
