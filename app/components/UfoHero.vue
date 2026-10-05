@@ -2,7 +2,6 @@
   <div
     ref="containerRef"
     class="relative w-full h-[100dvh] overflow-hidden bg-[#722F99]"
-    style="touch-action: none;"
     aria-label="UNMANAGED UFO Interactive Sequence"
     role="img"
   >
@@ -207,29 +206,69 @@ onMounted(() => {
     return Math.max(0.4, Math.min(1.1, W / BASE_W))
   }
 
-  // Pointer
+  // Pointer & Touch Events
   const pointer = { x: W / 2, y: H / 2 }
+  let isBeaming = false
+  let isDraggingUFO = false
+
   function setPointerFromEvent(clientX: number, clientY: number) {
     const rect = canvas!.getBoundingClientRect()
     pointer.x = clientX - rect.left
     pointer.y = clientY - rect.top
   }
   
-  let isBeaming = false
-  const onMove = (e: PointerEvent) => setPointerFromEvent(e.clientX, e.clientY)
-  const onDown = (e: PointerEvent) => {
-    setPointerFromEvent(e.clientX, e.clientY)
-    isBeaming = true
+  const onPointerMove = (e: PointerEvent) => {
+    if (e.pointerType === 'mouse') setPointerFromEvent(e.clientX, e.clientY)
   }
-  const onUp = () => { isBeaming = false }
+  const onPointerDown = (e: PointerEvent) => {
+    if (e.pointerType === 'mouse') {
+      isBeaming = true
+      setPointerFromEvent(e.clientX, e.clientY)
+    }
+  }
+  const onPointerUp = (e: PointerEvent) => {
+    if (e.pointerType === 'mouse') isBeaming = false
+  }
+
+  const onTouchStart = (e: TouchEvent) => {
+    const rect = canvas!.getBoundingClientRect()
+    const tx = e.touches[0].clientX - rect.left
+    const ty = e.touches[0].clientY - rect.top
+    const dist = Math.hypot(tx - ufoX, ty - ufoY)
+    
+    // Require precise tap on mobile to grab UFO, otherwise allow normal scrolling
+    if (dist < 120 * responsiveScale()) {
+      e.preventDefault()
+      isBeaming = true
+      isDraggingUFO = true
+      setPointerFromEvent(e.touches[0].clientX, e.touches[0].clientY)
+    }
+  }
+  const onTouchMove = (e: TouchEvent) => {
+    if (isDraggingUFO && e.touches[0]) {
+      e.preventDefault()
+      setPointerFromEvent(e.touches[0].clientX, e.touches[0].clientY)
+    }
+  }
+  const onTouchEnd = () => {
+    isBeaming = false
+    isDraggingUFO = false
+  }
   
-  canvas.addEventListener("pointermove", onMove)
-  canvas.addEventListener("pointerdown", onDown)
-  window.addEventListener("pointerup", onUp)
-  canvas.addEventListener("touchmove", (e: TouchEvent) => {
-    e.preventDefault()
-    if (e.touches[0]) setPointerFromEvent(e.touches[0].clientX, e.touches[0].clientY)
-  }, { passive: false })
+  canvas.addEventListener("pointermove", onPointerMove)
+  canvas.addEventListener("pointerdown", onPointerDown)
+  window.addEventListener("pointerup", onPointerUp)
+  canvas.addEventListener("touchstart", onTouchStart, { passive: false })
+  window.addEventListener("touchmove", onTouchMove, { passive: false })
+  window.addEventListener("touchend", onTouchEnd)
+
+  // Mobile Performance Optimizations
+  const isMobileView = window.innerWidth < 640
+  if (isMobileView) {
+    cfg.showEmbers = false
+    cfg.debrisCount = 3
+    cfg.beamRadius = 80
+  }
 
   // Shake
   let shakeIntensity = 0, shakeX = 0, shakeY = 0
@@ -302,37 +341,52 @@ onMounted(() => {
 
   // Layout Text
   type TextEntry = { text: string; font: string; fontSize: number; color: string; alpha: number; yOffset: number; maxWidth: number; lineHeight: number; column: "left" | "right" | "center" }
-  function buildTextEntries(scale: number, availH: number, twoCol: boolean): TextEntry[] {
+  function buildTextEntries(scale: number, availH: number, twoCol: boolean, isMobile: boolean): TextEntry[] {
+    // Dynamic sizing to prevent massive wrap-overflows on mobile
+    const titleSize = isMobile ? Math.min(60, (W * 0.15)) : 130 * scale
+    const taglineSize = isMobile ? 10 : 13 * scale
+    const titleLineHeight = titleSize * 1.05
+    
+    // Push credits down based on title height. Title might wrap to 2-3 lines on mobile.
+    const estTitleLines = isMobile ? Math.ceil((ctx!.measureText(title).width || W) / (W * 0.9)) : 1
+    const startY = isMobile ? Math.max(H * 0.4, my + 60 + estTitleLines * titleLineHeight) : 210 * scale
+    
     const entries: TextEntry[] = [
-      { text: tagline, font: `700 13px ${F_MONO}`, fontSize: 13 * scale, color: COL_DIM, alpha: 0.6, yOffset: -50 * scale, maxWidth: 1300, lineHeight: 20, column: "center" },
-      { text: title, font: `900 130px ${F_DISPLAY}`, fontSize: 130 * scale, color: COL_TITLE_GHOST, alpha: 0.8, yOffset: -10 * scale, maxWidth: 1300, lineHeight: 140 * scale, column: "center" },
+      { text: tagline, font: `700 ${taglineSize}px ${F_MONO}`, fontSize: taglineSize, color: COL_DIM, alpha: 0.6, yOffset: -50 * scale, maxWidth: 1300, lineHeight: taglineSize * 1.5, column: "center" },
+      { text: title, font: `900 ${titleSize}px ${F_DISPLAY}`, fontSize: titleSize, color: COL_TITLE_GHOST, alpha: 0.8, yOffset: -10 * scale, maxWidth: 1300, lineHeight: titleLineHeight, column: "center" },
     ]
-    const startY = 210 * scale
+    
     const rowCount = twoCol ? Math.ceil(credits.length / 2) : credits.length
     const bottomMargin = 60 * scale
     const idealGap = rowCount > 0 ? (availH - startY - bottomMargin) / rowCount : 0
-    const rowGap = Math.max(56 * scale, Math.min(96 * scale, idealGap))
-    const nameSize = Math.max(15, Math.min(34, rowGap * 0.34)) * scale
-    const labelSize = 12 * scale
+    const rowGap = Math.max(30 * scale, Math.min(96 * scale, idealGap)) // Smaller minimum row gap for mobile
+    
+    const nameSize = isMobile ? 14 : Math.max(15, Math.min(34, rowGap * 0.34)) * scale
+    const labelSize = isMobile ? 10 : 12 * scale
 
     credits.forEach((c, i) => {
       const row = twoCol ? Math.floor(i / 2) : i
       const y = startY + row * rowGap
-      const col = twoCol ? (i % 2 === 0 ? "left" : "right") : "left"
-      entries.push({ text: c.role.toUpperCase(), font: `700 12px ${F_MONO}`, fontSize: labelSize, color: COL_LABEL, alpha: 0.9, yOffset: y, maxWidth: 900, lineHeight: 18, column: col })
-      entries.push({ text: c.name, font: `600 ${nameSize}px ${F_CREDIT}`, fontSize: nameSize, color: COL_CREDIT, alpha: 0.95, yOffset: y + Math.max(18, nameSize * 0.7), maxWidth: 640, lineHeight: nameSize * 1.15, column: col })
+      const col = twoCol ? (i % 2 === 0 ? "left" : "right") : "center" // Center align credits on mobile for a cleaner look
+      entries.push({ text: c.role.toUpperCase(), font: `700 ${labelSize}px ${F_MONO}`, fontSize: labelSize, color: COL_LABEL, alpha: 0.9, yOffset: y, maxWidth: 900, lineHeight: labelSize * 1.5, column: col })
+      entries.push({ text: c.name, font: `600 ${nameSize}px ${F_CREDIT}`, fontSize: nameSize, color: COL_CREDIT, alpha: 0.95, yOffset: y + Math.max(14, nameSize * 0.8), maxWidth: 640, lineHeight: nameSize * 1.15, column: col })
     })
     return entries
   }
 
+  let my = 0 // defined in outer scope for dynamic sizing
   function layoutAllText() {
     letterCount = 0; lChar.length = 0; lFont.length = 0; lColor.length = 0
     const scale = responsiveScale()
-    const mx = Math.max(30, W * 0.06), my = Math.max(50, H * 0.08)
+    const mx = Math.max(30, W * 0.06); my = Math.max(50, H * 0.08)
     const cw = W - mx * 2
-    const twoCol = cw > 640
+    const isMobile = cw < 640
+    const twoCol = !isMobile
     const availH = H - my
-    const entries = buildTextEntries(scale, availH, twoCol)
+    
+    // Set a baseline font for measureText before building entries
+    ctx!.font = `900 ${isMobile ? Math.min(60, W * 0.15) : 130 * scale}px ${F_DISPLAY}`
+    const entries = buildTextEntries(scale, availH, twoCol, isMobile)
     const col2X = twoCol ? mx + cw * 0.56 : mx
 
     for (const entry of entries) {
@@ -912,9 +966,12 @@ onMounted(() => {
     stopLoop()
     visObserver?.disconnect()
     document.removeEventListener('visibilitychange', syncLoop)
-    canvas.removeEventListener("pointermove", onMove)
-    canvas.removeEventListener("pointerdown", onDown)
-    window.removeEventListener("pointerup", onUp)
+    canvas.removeEventListener("pointermove", onPointerMove)
+    canvas.removeEventListener("pointerdown", onPointerDown)
+    window.removeEventListener("pointerup", onPointerUp)
+    canvas.removeEventListener("touchstart", onTouchStart)
+    window.removeEventListener("touchmove", onTouchMove)
+    window.removeEventListener("touchend", onTouchEnd)
     if (ro) ro.disconnect()
   }
 })
