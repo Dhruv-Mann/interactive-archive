@@ -2,7 +2,7 @@
   <div class="w-full overflow-x-hidden bg-[#07070A]">
     <section
       ref="heroSectionRef"
-      class="hero relative w-screen h-screen px-4 flex flex-col items-center justify-center bg-[#07070A] text-white overflow-hidden"
+      class="hero relative w-screen min-h-[100dvh] md:h-screen py-20 md:py-0 px-4 flex flex-col items-center justify-center bg-[#07070A] text-white overflow-hidden"
     >
       <!-- Background Swiper (Z-index 0) -->
       <div
@@ -34,7 +34,7 @@
       <!-- Animated Icons (Z-index 2) -->
       <div
         ref="animatedIconsRef"
-        class="animated-icons fixed bottom-10 left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 w-[90%] md:w-[60%] will-change-transform z-10"
+        class="animated-icons md:fixed relative bottom-auto md:bottom-10 left-auto md:left-1/2 md:-translate-x-1/2 flex flex-wrap md:flex-nowrap items-center justify-center gap-4 md:gap-2 w-[95%] md:w-[60%] will-change-transform z-10 mb-8 md:mb-0"
       >
         <div
           v-for="(member, index) in teamMembersData"
@@ -165,7 +165,7 @@ onMounted(async () => {
 
   mm = gsap.matchMedia()
   
-  mm.add("(min-width: 300px)", () => {
+  mm.add("(min-width: 768px)", () => {
     ScrollTrigger.create({
       trigger: heroSectionRef.value,
       start: "top top",
@@ -353,6 +353,36 @@ onMounted(async () => {
           })
         }
       }
+    })
+  })
+
+  // MOBILE: Minimal optimized animation, no heavy pinning or scrubbing
+  mm.add("(max-width: 767px)", () => {
+    // 1. Reveal elements statically
+    gsap.set(heroHeaderRef.value, { opacity: 0.6, transform: "none" })
+    textSegmentsRef.value.forEach(segment => {
+      if (segment) gsap.set(segment, { opacity: 1 })
+    })
+    placeholdersRef.value.forEach(ph => {
+      if (ph) gsap.set(ph, { display: "none" })
+    })
+    iconElementsRef.value.forEach(icon => {
+      if (icon) gsap.set(icon, { x: 0, y: 0, scale: 1 })
+    })
+    teamInfoRefs.value.forEach(info => {
+      if (info) gsap.set(info, { opacity: 1 })
+    })
+
+    // 2. Simple fade-up on scroll
+    ScrollTrigger.create({
+      trigger: heroSectionRef.value,
+      start: "top 80%",
+      end: "top 20%",
+      scrub: 1,
+      animation: gsap.fromTo(heroSectionRef.value, 
+        { opacity: 0.2, y: 40 }, 
+        { opacity: 1, y: 0, ease: "power2.out" }
+      )
     })
   })
 
