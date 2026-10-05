@@ -35,7 +35,7 @@
 
         <!-- The light beam -->
         <div 
-          class="h-full w-[2px] z-10"
+          class="hidden sm:block h-full w-[2px] z-10"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
 
@@ -62,7 +62,7 @@
       >
         <!-- The light beam -->
         <div 
-          class="h-full w-[2px] z-10 absolute top-0 bottom-0"
+          class="hidden sm:block h-full w-[2px] z-10 absolute top-0 bottom-0"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
 
@@ -175,7 +175,7 @@
         </div>
 
         <div 
-          class="h-full w-[2px] z-10 pointer-events-none"
+          class="hidden sm:block h-full w-[2px] z-10 pointer-events-none"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
       </div>
@@ -205,7 +205,7 @@
         </div>
 
         <div 
-          class="h-full w-[2px] z-10"
+          class="hidden sm:block h-full w-[2px] z-10"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
       </div>
@@ -237,7 +237,7 @@
         </div>
 
         <div 
-          class="h-full w-[2px] z-10"
+          class="hidden sm:block h-full w-[2px] z-10"
           style="background: linear-gradient(to bottom, transparent 0%, #E6E6FA 15%, #E6E6FA 85%, transparent 100%); box-shadow: 0 0 20px rgba(230, 230, 250, 0.6), 0 0 40px rgba(181, 126, 220, 0.4);"
         ></div>
       </div>
