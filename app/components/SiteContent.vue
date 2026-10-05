@@ -13,7 +13,7 @@
       <NewLandingHero />
 
       <!-- Timeline Light Beam Connector 0 -->
-      <div class="timeline-spacer h-[25vh] sm:h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
+      <div class="timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex items-center justify-center relative overflow-hidden">
         
         <!-- 1. Top label — hidden on mobile to prevent overflow -->
         <div class="hidden sm:flex absolute top-[15%] right-[52vw] flex-col gap-3 text-[12px] font-mono text-zinc-300 tracking-[0.2em] uppercase text-right z-20">
@@ -25,7 +25,7 @@
           <img 
             src="/ascii-art.png" 
             alt="ASCII Art" 
-            class="h-[20vh] sm:h-[60vh] w-auto mix-blend-screen object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]"
+            class="h-[50vh] sm:h-[60vh] w-auto mix-blend-screen object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]"
             style="
               -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 50%, black 30%, rgba(0,0,0,0.6) 60%, transparent 85%);
               mask-image: radial-gradient(ellipse 60% 65% at 50% 50%, black 30%, rgba(0,0,0,0.6) 60%, transparent 85%);
