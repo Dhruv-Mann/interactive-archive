@@ -181,23 +181,21 @@
       </div>
 
       <!-- 3. Blood Quote Section -->
-      <BloodQuote />
+      <BloodQuote v-if="!isMobile" />
 
-      <!-- Timeline Light Beam Connector 3 -->
-      <div id="connector-3" class="timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
+      <!-- Timeline Light Beam Connector 3 (also hidden on mobile) -->
+      <div v-if="!isMobile" id="connector-3" class="timeline-spacer h-[60vh] sm:h-[80vh] w-full pointer-events-none flex flex-col items-center justify-center relative overflow-hidden">
         <!-- ASCII lion skull — centered on mobile, right side on desktop -->
         <div
           ref="spacer3WrapRef"
-          class="absolute flex items-center justify-center pointer-events-none"
-          :class="isMobile ? 'inset-0' : 'right-[4vw]'"
+          class="absolute flex items-center justify-center pointer-events-none right-[4vw]"
           style="opacity: 0"
         >
           <img
             ref="spacer3ImageRef"
             src="/ascii-lion.png"
             alt="ASCII Lion"
-            class="relative z-10 object-contain"
-            :class="isMobile ? 'max-h-[50vh] max-w-[80vw]' : 'max-h-[65vh] max-w-[50vw]'"
+            class="relative z-10 object-contain max-h-[65vh] max-w-[50vw]"
             style="
               mix-blend-mode: screen;
               -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, black 30%, rgba(0,0,0,0.6) 55%, transparent 80%);
