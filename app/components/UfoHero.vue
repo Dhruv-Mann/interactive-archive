@@ -359,13 +359,16 @@ onMounted(() => {
     const taglineSize = isMobile ? 10 : 13 * scale
     const titleLineHeight = titleSize * 1.05
     
+    const titleYOffset = isMobile ? 25 : -10 * scale
+    const taglineYOffset = isMobile ? -60 : -50 * scale
+    
     // Push credits down based on title height. Title might wrap to 2-3 lines on mobile.
     const estTitleLines = isMobile ? Math.ceil((ctx!.measureText(title).width || W) / (W * 0.9)) : 1
-    const startY = isMobile ? Math.max(H * 0.4, my + 60 + estTitleLines * titleLineHeight) : 210 * scale
+    const startY = isMobile ? Math.max(H * 0.4, my + 60 + titleYOffset + estTitleLines * titleLineHeight) : 210 * scale
     
     const entries: TextEntry[] = [
-      { text: tagline, font: `700 ${taglineSize}px ${F_MONO}`, fontSize: taglineSize, color: COL_DIM, alpha: 0.6, yOffset: -50 * scale, maxWidth: 1300, lineHeight: taglineSize * 1.5, column: "center" },
-      { text: title, font: `900 ${titleSize}px ${F_DISPLAY}`, fontSize: titleSize, color: COL_TITLE_GHOST, alpha: 0.8, yOffset: -10 * scale, maxWidth: 1300, lineHeight: titleLineHeight, column: "center" },
+      { text: tagline, font: `700 ${taglineSize}px ${F_MONO}`, fontSize: taglineSize, color: COL_DIM, alpha: 0.6, yOffset: taglineYOffset, maxWidth: 1300, lineHeight: taglineSize * 1.5, column: "center" },
+      { text: title, font: `900 ${titleSize}px ${F_DISPLAY}`, fontSize: titleSize, color: COL_TITLE_GHOST, alpha: 0.8, yOffset: titleYOffset, maxWidth: 1300, lineHeight: titleLineHeight, column: "center" },
     ]
     
     const rowCount = twoCol ? Math.ceil(credits.length / 2) : credits.length
