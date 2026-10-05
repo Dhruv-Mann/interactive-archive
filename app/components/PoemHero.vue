@@ -82,17 +82,9 @@ const contentRef = ref<HTMLElement | null>(null)
 const adjustContentSize = (): void => {
   if (!contentRef.value || !heroSectionRef.value || typeof window === 'undefined') return
   const viewportWidth = window.innerWidth
-  
-  let scaleFactor = 1;
-  if (viewportWidth < 640) {
-    // Drastically increase scale on phones so the room is nice and tall.
-    // This deliberately allows the sides to bleed off the edges, hiding the hands.
-    scaleFactor = 0.85;
-  } else if (viewportWidth < 1000) {
-    scaleFactor = (viewportWidth / 1000) * 0.9;
-  } else {
-    scaleFactor = Math.min(1, viewportWidth / 1100);
-  }
+  const scaleFactor = viewportWidth < 1000
+    ? (viewportWidth / 1000) * 0.9
+    : Math.min(1, viewportWidth / 1100)
   
   contentRef.value.style.transform = `scale(${scaleFactor})`
 
