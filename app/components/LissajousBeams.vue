@@ -23,9 +23,10 @@ let cachedW = 0;
 let cachedH = 0;
 
 const waves = [
-  { baseOffset: 0.10, amp: 0.05, freq: 0.015, speed: 2.0, phase: 0 },
-  { baseOffset: 0.16, amp: 0.08, freq: 0.010, speed: 1.5, phase: Math.PI / 3 },
-  { baseOffset: 0.24, amp: 0.12, freq: 0.005, speed: 1.0, phase: Math.PI / 1.5 },
+  { baseOffset: 0.05, speed: 2.0 },
+  { baseOffset: 0.09, speed: 1.6 },
+  { baseOffset: 0.14, speed: 1.2 },
+  { baseOffset: 0.20, speed: 0.8 },
 ];
 
 function rebuildCache() {
@@ -62,7 +63,8 @@ function rebuildCache() {
       path.moveTo(startX, startY);
       for (let y = startY; y <= endY; y += 2) {
         const progress = (y - startY) / (endY - startY);
-        const envelope = Math.sin(progress * Math.PI);
+        // Using a fractional power makes it shoot out quickly at the poles and run almost vertically (steeply) in the middle.
+        const envelope = Math.pow(Math.sin(progress * Math.PI), 0.35);
         const xOffset = wave.baseOffset * width * props.spread * envelope;
         path.lineTo(startX + direction * xOffset, y);
       }
