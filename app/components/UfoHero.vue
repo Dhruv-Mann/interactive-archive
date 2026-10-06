@@ -452,6 +452,76 @@ onMounted(() => {
     ufoY += (pointer.y - ufoY) * cfg.ufoSpeed
   }
 
+  // Cow Logic
+  let cowX = 0, cowY = 0;
+  let cowState = 'hidden';
+  let cowTimer = 2;
+  let cowAng = 0;
+  let cowScale = 1;
+  const cowBaseScale = 50; // larger cow
+  
+  function updateCow(dt: number) {
+    if (cowState === 'hidden') {
+      cowTimer -= dt;
+      if (cowTimer <= 0) {
+        cowState = 'active';
+        // fixed bottom center
+        cowX = W / 2;
+        cowY = H * 0.85;
+        cowScale = 1;
+      }
+      return;
+    }
+    
+    if (cowState === 'active') {
+      // gentle wiggle
+      cowAng = Math.sin(performance.now() / 150) * 0.15;
+      
+      // Eat check
+      const dx = ufoX - cowX;
+      const dy = ufoY - cowY;
+      const distSq = dx*dx + dy*dy;
+      const sc = cfg.ufoScale * responsiveScale();
+      if (distSq < (80 * sc * 80 * sc)) { // larger capture radius
+        cowState = 'being_eaten';
+        cowTimer = 0.6; // eating duration
+        triggerShake(2);
+      }
+    } else if (cowState === 'being_eaten') {
+      cowTimer -= dt;
+      
+      // Get sucked towards the UFO
+      cowX += (ufoX - cowX) * 0.2;
+      cowY += (ufoY - cowY) * 0.2;
+      
+      // Spin wildly
+      cowAng += dt * 25;
+      
+      // Shrink away
+      cowScale = Math.max(0, cowTimer / 0.6);
+      
+      if (cowTimer <= 0) {
+        cowState = 'hidden';
+        cowTimer = 4 + Math.random() * 4; // respawn later
+        triggerShake(6);
+        for(let i = 0; i < 20; i++) spawnEmber(ufoX, ufoY);
+      }
+    }
+  }
+
+  function drawCow() {
+    if (cowState === 'hidden') return;
+    ctx!.save();
+    ctx!.translate(cowX, cowY);
+    ctx!.rotate(cowAng);
+    ctx!.scale(cowScale, cowScale);
+    ctx!.font = `${cowBaseScale * responsiveScale()}px sans-serif`;
+    ctx!.textAlign = "center";
+    ctx!.textBaseline = "middle";
+    ctx!.fillText("🐄", 0, 0);
+    ctx!.restore();
+  }
+
   function interactLetters(dt: number) {
     const sc = cfg.ufoScale * responsiveScale()
     const bodyRadX = 52 * sc, bodyRadY = 18 * sc
@@ -930,11 +1000,13 @@ onMounted(() => {
     drawTunnel()
     drawStars(time)
     updateUFO()
+    updateCow(dt)
     interactLetters(dt)
     emitBeam(dt)
     updateParticlesAndEmbers(dt)
     updateDebris(dt, time)
     drawLetters()
+    drawCow()
     drawDebris(time)
     drawParticles()
     drawUFO(time)
